@@ -29,11 +29,13 @@ if __name__ == "__main__":
     model.add(keras.Input(shape=(training_data.shape[1], 1)))
     model.add(layers.LSTM(512, activation='relu', return_sequences=True, name='lstm_1'))
     model.add(layers.LSTM(256, activation='relu', return_sequences=True, name='lstm_2'))
+    model.add(layers.LSTM(128, activation='relu', return_sequences=True, name='lstm_3'))
     model.add(layers.Flatten())
     model.add(layers.Dropout(0.3))
     model.add(layers.Dense(256, activation='relu', name='dense_1'))
-    model.add(layers.Dense(64, activation='relu', name='dense_2'))
-    model.add(layers.Dense(1, name='dense_3'))
+    model.add(layers.Dense(512, activation='relu', name='dense_2'))
+    model.add(layers.Dense(1000, activation='relu', name='dense_3'))
+    model.add(layers.Dense(1, name='output'))
     
     checkpoint_filepath = './chkpt/checkpoint.index'
     checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_filepath, save_weights_only=True,
@@ -43,6 +45,7 @@ if __name__ == "__main__":
     lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, 
                                                     decay_steps=10*steps_per_epochs, decay_rate=0.95)
     opt = keras.optimizers.Adam(learning_rate=lr_schedule)
+    
     model.compile(optimizer=opt, loss='mape', metrics=['mae', 'mse'])
     model.summary()
     hist = model.fit(training_data, training_targets, batch_size=batch_size, epochs=epochs,
