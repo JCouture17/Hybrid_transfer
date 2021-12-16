@@ -33,8 +33,8 @@ if __name__ == "__main__":
     model.add(layers.Flatten())
     model.add(layers.Dropout(0.3))
     model.add(layers.Dense(256, activation='relu', name='dense_1'))
-    model.add(layers.Dense(512, activation='relu', name='dense_2'))
-    model.add(layers.Dense(1000, activation='relu', name='dense_3'))
+    # model.add(layers.Dense(512, activation='relu', name='dense_2'))
+    model.add(layers.Dense(500, activation='relu', name='dense_3'))
     model.add(layers.Dense(1, name='output'))
     
     checkpoint_filepath = './chkpt/checkpoint.index'

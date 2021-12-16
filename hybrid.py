@@ -9,6 +9,7 @@ import torch.nn as nn
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
+import os
 
 def load_data():
     from misc_functions import functions
@@ -31,9 +32,9 @@ class Identity(nn.Module):
         return(x)
 
 if __name__ == "__main__":
-    epochs = 100
+    epochs = 10
     batch_size = 256
-    lr = 0.001
+    learning_rate = 0.001
     early_stop = 5
     model_name = 'alexnet'
     '''
@@ -45,14 +46,18 @@ if __name__ == "__main__":
         - googlenet;
         - alexnet
     '''
-    training, testing = data.load_dataset(batch_size)
+    
+    ## Loading the transferred network
+    # training, testing = data.load_dataset(batch_size)
     
     model = models.alexnet(pretrained=True)
     for param in model.parameters():
         param.requires_grad = False 
     num_features = model.classifier[1].in_features
-    model.classificer = Identity()
+    model.classifier = Identity()
     
+    
+    ## Training the LSTM
     training_data, training_targets, testing_data, testing_targets = load_data()
     
     lstm = keras.Sequential()
@@ -64,5 +69,39 @@ if __name__ == "__main__":
     lstm.add(layers.Dense(256, activation='relu', name='dense_1'))
     lstm.add(layers.Dense(512, activation='relu', name='dense_2'))
     lstm.add(layers.Dense(num_features, name='dense_3'))
+    
+    checkpoint_filepath = './chkpt/checkpoint.index'
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_filepath, save_weights_only=True,
+                                                    monitor='val_loss', mode='min', save_best_only='True')
+    
+    steps_per_epochs = np.ceil(training_data.shape[0] / batch_size)
+    lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, 
+                                                    decay_steps=10*steps_per_epochs, decay_rate=0.95)
+    opt = keras.optimizers.Adam(learning_rate=lr_schedule)
+    lstm.compile(optimizer=opt, loss='mape', metrics=['mae', 'mse'])
+    hist = lstm.fit(training_data, training_targets, batch_size=batch_size, epochs=epochs,
+              validation_data = (testing_data, testing_targets), shuffle=True, callbacks=[checkpoint])
+    
+    plt.plot(hist.history['loss'], label='training loss')
+    plt.plot(hist.history['val_loss'], label='validation loss')
+    plt.xlabel('epochs')
+    plt.ylabel('mean absolute percentage error loss')
+    plt.legend()
+    
+    latest = tf.train.latest_checkpoint(os.path.dirname(checkpoint_filepath))
+    model.load_weights(checkpoint_filepath)
+    model.evaluate(testing_data, testing_targets)
+
+    
+    ## Adding a decoder layer
+    decoder = keras.Sequential()
+    decoder.add(keras.Input(shape=(1500, 1)))
+    decoder.add(layers.Dense(1024, activation='relu'))
+    decoder.add(layers.Dense(512, activation='relu'))
+    decoder.add(layers.Dense(128, activation='relu'))
+    decoder.add(layers.Dense(1))
+    
+    
+    
     
     
