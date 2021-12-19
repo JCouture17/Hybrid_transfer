@@ -9,10 +9,12 @@ import os
 def load_data():
     from misc_functions import functions
     fcts = functions() 
-    training_data = fcts.load('./Matlab/train_test_his/training_data.mat', 'training').astype(np.float16)   
-    testing_data = fcts.load('./Matlab/train_test_his/testing_data.mat', 'testing').astype(np.float16)
-    training_targets = fcts.load('./Matlab/train_test_his/training_rul.mat', 'rul')
-    testing_targets = fcts.load('./Matlab/train_test_his/testing_rul.mat', 'rul')
+    training_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_dataset.mat', 
+                              'training_data').astype(np.float16)   
+    testing_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_dataset.mat',
+                             'testing_data').astype(np.float16)
+    training_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat', 'training_targets')
+    testing_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat', 'testing_targets')
     
     training_data = training_data.reshape([training_data.shape[0], training_data.shape[1], 1])
     testing_data = testing_data.reshape([testing_data.shape[0], testing_data.shape[1], 1])

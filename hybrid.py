@@ -1,4 +1,3 @@
-from train import train
 import matplotlib.pyplot as plt
 import numpy as np
 from models import transfer_model
@@ -34,10 +33,12 @@ class CustomImageDataset:
 def load_data():
     from misc_functions import functions
     fcts = functions() 
-    training_data = fcts.load('./Matlab/train_test_his/training_data.mat', 'training').astype(np.float16)   
-    testing_data = fcts.load('./Matlab/train_test_his/testing_data.mat', 'testing').astype(np.float16)
-    training_targets = fcts.load('./Matlab/train_test_his/training_rul.mat', 'rul')
-    testing_targets = fcts.load('./Matlab/train_test_his/testing_rul.mat', 'rul')
+    training_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_dataset.mat', 
+                              'training_data').astype(np.float16)   
+    testing_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_dataset.mat',
+                             'testing_data').astype(np.float16)
+    training_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat', 'training_targets')
+    testing_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat', 'testing_targets')
     
     training_data = training_data.reshape([training_data.shape[0], training_data.shape[1], 1])
     testing_data = testing_data.reshape([testing_data.shape[0], testing_data.shape[1], 1])
@@ -89,7 +90,7 @@ if __name__ == "__main__":
         - alexnet
     '''
     
-    ## Loading the transferred network
+    ## Loading the transferred network and data
     train_data, test_data = load_images()
     
     model = models.alexnet(pretrained=True)
@@ -99,13 +100,17 @@ if __name__ == "__main__":
     model.classifier = Identity()
     summary(model,(3,224,224))
     
+    # Compute the Tl model output to combine the LSTM's output
     tl_output = torch.empty(1,num_features).cuda()
-    for i, x in enumerate(test_data): 
+    for i, x in enumerate(train_data): 
         x = x.cuda()
         tl_output = torch.cat((tl_output, model(x)))
-        
+    tl_test = torch.empty(1, num_features).cuda()
+    for i, x in enumerate(test_data):
+        x = x.cuda()
+        tl_test = torch.cat((tl_test, model(x)))
     
-    ## Training the LSTM
+    # Importing the LSTM model
     training_data, training_targets, testing_data, testing_targets = load_data()
     
     lstm = keras.Sequential()
@@ -119,38 +124,35 @@ if __name__ == "__main__":
     lstm.add(layers.Dense(1000, name='dense_3'))
     lstm.add(layers.Dense(1, name='output_layer'))
     
-    checkpoint_filepath = './chkpt/checkpoint.index'
-    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_filepath, save_weights_only=True,
-                                                    monitor='val_loss', mode='min', save_best_only='True')
     
+    # checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_filepath, save_weights_only=True,
+    #                                                 monitor='val_loss', mode='min', save_best_only='True')
+    # 
     steps_per_epochs = np.ceil(training_data.shape[0] / batch_size)
     lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, 
                                                     decay_steps=10*steps_per_epochs, decay_rate=0.95)
     opt = keras.optimizers.Adam(learning_rate=lr_schedule)
-    lstm.compile(optimizer=opt, loss='mape', metrics=['mae', 'mse'])
-    lstm.summary()
-    hist = lstm.fit(training_data, training_targets, batch_size=batch_size, epochs=epochs,
-              validation_data = (testing_data, testing_targets), shuffle=True, callbacks=[checkpoint])
+    # lstm.compile(optimizer=opt, loss='mape', metrics=['mae', 'mse'])
     
-    plt.plot(hist.history['loss'], label='training loss')
-    plt.plot(hist.history['val_loss'], label='validation loss')
-    plt.xlabel('epochs')
-    plt.ylabel('mean absolute percentage error loss')
-    plt.legend()
-    
+    # Load in the trained LSTM model
+    checkpoint_filepath = './chkpt/checkpoint.index'
     latest = tf.train.latest_checkpoint(os.path.dirname(checkpoint_filepath))
     lstm.load_weights(checkpoint_filepath)
-    lstm.evaluate(testing_data, testing_targets)
+    lstm.evaluate(testing_data, testing_targets) # obtain the LSTM's accuracy on its own
     lstm.pop() # removes the final output layer of the LSTM
     lstm.summary()
     
+    # Compute the LSTM output to combine with the TL model
     lstm_output = np.array(lstm.predict(training_data))
     lstm_output = torch.tensor(lstm_output)
+    lstm_test = np.array(lstm.predict(testing_data))
+    lstm_test = torch.tensor(lstm_test)
 
     ## Adding a decoder layer
-    ### TO THE SAME FOR THE TESTING DATA ###
     parallel_data = torch.cat((lstm_output, tl_output))
     parallel_targets = training_targets
+    parallel_test_data = torch.cat((lstm_test, tl_test))
+    parallel_test_targets = testing_targets
     
     decoder = keras.Sequential()
     decoder.add(keras.Input(shape=(1000+num_features, 1)))
@@ -161,10 +163,14 @@ if __name__ == "__main__":
     
     decoder.compile(optimizer=opt, loss='mape', metrics=['mae', 'mse'])
     hist2 = decoder.fit(parallel_data, parallel_targets, batch_size=batch_size, epochs=epochs,
+                        validation_data = (parallel_test_data, parallel_test_targets),
                         shuffle=True, callbacks=[checkpoint_filepath])
     
-    
-    
+    plt.plot(hist2.history['loss'], label='training loss')
+    plt.plot(hist2.history['val_loss'], label='validation loss')
+    plt.xlabel('epochs')
+    plt.ylabel('mean absolute percentage error loss')
+    plt.legend()
     
     
     
