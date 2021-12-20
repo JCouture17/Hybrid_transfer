@@ -1,0 +1,2 @@
+model_checkpoint_path: "checkpoint_hybrid.index"
+all_model_checkpoint_paths: "checkpoint_hybrid.index"

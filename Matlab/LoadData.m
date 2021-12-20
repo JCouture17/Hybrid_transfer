@@ -7,12 +7,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear; close all; clc
 
-load('.\Data\2017-05-12_batchdata_updated_struct_errorcorrect')
+load('./Data/2017-05-12_batchdata_updated_struct_errorcorrect')
 
 batch1 = batch; 
 numBat1 = size(batch1,2);
 
-load('.\Data\2017-06-30_batchdata_updated_struct_errorcorrect')
+load('./Data/2017-06-30_batchdata_updated_struct_errorcorrect')
 
 %Some batteries continued from the first run into the second. We append 
 %those to the first batch before continuing.
@@ -45,7 +45,7 @@ batch2 = batch;
 numBat2 = size(batch2,2);
 clearvars batch
 
-load('.\Data\2018-04-12_batchdata_updated_struct_errorcorrect')
+load('./Data/2018-04-12_batchdata_updated_struct_errorcorrect')
 batch3 = batch;
 batch3(38) = []; %remove channel 46 upfront; there was a problem with 
 %the data collection for this channel

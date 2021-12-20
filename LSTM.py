@@ -3,16 +3,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers, Sequential
+from tensorflow.keras import layers
 import os
     
 def load_data():
     from misc_functions import functions
     fcts = functions() 
-    training_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_dataset.mat', 
-                              'training_data').astype(np.float16)   
-    testing_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_dataset.mat',
-                             'testing_data').astype(np.float16)
+    training_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_his.mat',
+                              'training_his').astype(np.float16)   
+    testing_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_his.mat',
+                             'testing_his').astype(np.float16)
     training_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat', 'training_targets')
     testing_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat', 'testing_targets')
     
@@ -23,7 +23,7 @@ def load_data():
 
 if __name__ == "__main__":
     epochs = 300
-    batch_size = 256
+    batch_size = 512
     learning_rate = 0.001
     training_data, training_targets, testing_data, testing_targets = load_data()
     
@@ -48,7 +48,7 @@ if __name__ == "__main__":
                                                     decay_steps=10*steps_per_epochs, decay_rate=0.95)
     opt = keras.optimizers.Adam(learning_rate=lr_schedule)
     
-    model.compile(optimizer=opt, loss='mape', metrics=['mae', 'mse'])
+    model.compile(optimizer=opt, loss='mse', metrics=['mae', 'mape'])
     model.summary()
     hist = model.fit(training_data, training_targets, batch_size=batch_size, epochs=epochs,
               validation_data = (testing_data, testing_targets), shuffle=True, callbacks=[checkpoint])
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     plt.plot(hist.history['loss'], label='training loss')
     plt.plot(hist.history['val_loss'], label='validation loss')
     plt.xlabel('epochs')
-    plt.ylabel('mean absolute percentage error loss')
+    plt.ylabel('mean squared error loss')
     plt.legend()
     
     latest = tf.train.latest_checkpoint(os.path.dirname(checkpoint_filepath))
