@@ -48,9 +48,14 @@ class EarlyStopping:
 
 class train:
     
-    def mape(y_true, y_pred):
-        return (torch.sum(torch.div(torch.sub(y_true, y_pred).abs(), y_true.abs())))*100
-        # return (torch.sum(((torch.sub(y_true, y_pred).abs()))) / torch.sum(y_true.abs())) * 100
+    def mape(y_true, y_pred): 
+        mape = (torch.sum(torch.div(torch.abs(torch.sub(y_true, y_pred)), torch.abs(y_true))))*100
+        # mape = mape / len(y_true)
+        
+        # print('true ', y_true, '\nshape ', y_true.shape)
+        # print('prediction ', y_pred, '\nshape ', y_pred.shape)
+        # print('mape ', mape)
+        return mape
         
     def train_model(training, validation, lr, epochs, model_name, early_stop=5, opt='Adam'):
         t0 = time()
@@ -100,10 +105,9 @@ class train:
         model.eval()
         avg_loss = 0.0
         absolute_percentage_error = 0.0
-        pe, mae, se = 0.0, 0.0, 0.0
+        mae, se = 0.0, 0.0
         for i, (x_imgs, labels) in enumerate(val_loader):
-            if torch.cuda.is_available():
-                x_imgs, labels = x_imgs.cuda(), labels.cuda()
+            x_imgs, labels = x_imgs.cuda(), labels.cuda()
             # forward pass
             output = model(x_imgs)
             loss = criterion(output, labels)
@@ -121,8 +125,7 @@ class train:
         avg_loss = 0.0
         absolute_percentage_error = 0.0
         for i, (x_imgs, labels) in enumerate(train_loader):
-            if torch.cuda.is_available():
-                x_imgs, labels = x_imgs.cuda(), labels.cuda()
+            x_imgs, labels = x_imgs.cuda(), labels.cuda()
             optimizer.zero_grad()
             # forward pass
             pred = model(x_imgs)
@@ -133,6 +136,46 @@ class train:
             avg_loss += loss.item()
             absolute_percentage_error += train.mape(labels, pred)
         return {'loss': avg_loss / len(train_loader.dataset), 'accuracy': 100-(absolute_percentage_error / len(train_loader.dataset))}
+    
+    def train_lstm(model, criterion, optimizer, train_loader):
+        model.train()
+        avg_loss = 0.0
+        absolute_percentage_error = 0.0
+        for i, (x_imgs, labels) in enumerate(train_loader):
+            x_imgs, labels = x_imgs.float().cuda(), labels.cuda()
+            optimizer.zero_grad()
+            # forward pass
+            pred = model(x_imgs)
+            pred = torch.squeeze(pred, 2)
+            loss = criterion(pred, labels.float())
+            loss.backward()
+            optimizer.step()
+            # gather statistics
+            avg_loss += loss.item()
+            # print('labels ', labels)
+            # print('predictions ', pred)            
+            absolute_percentage_error += train.mape(labels, pred)
+        return {'loss': avg_loss / len(train_loader.dataset), 'accuracy': 100-(absolute_percentage_error / len(train_loader.dataset))}
+    
+    def valid_lstm(model, criterion, val_loader):
+        model.eval()
+        avg_loss = 0.0
+        absolute_percentage_error = 0.0
+        mae, se = 0.0, 0.0
+        for i, (x_imgs, labels) in enumerate(val_loader):
+            x_imgs, labels = x_imgs.float().cuda(), labels.cuda()
+            # forward pass
+            output = model(x_imgs)
+            output = torch.squeeze(output, 2)
+            loss = criterion(output, labels)
+            # gather statistics
+            avg_loss += loss.item()        
+            mae += torch.sum((abs(torch.sub(output, labels))))
+            se += torch.sum((abs(output - labels))**2)
+            absolute_percentage_error += train.mape(labels, output)
+        rmse = ((se/(len(val_loader.dataset)))**0.5)
+        return {'loss' : avg_loss / len(val_loader.dataset), 'accuracy' : 100-(absolute_percentage_error / len(val_loader.dataset)),
+                'MAE' : mae / len(val_loader.dataset), 'RMSE' : rmse}
     
     def test_model(model, test_loader):
         criterion = nn.MSELoss()

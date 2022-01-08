@@ -13,6 +13,8 @@ from misc_functions import functions
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
+from LSTM import load_data, CustomDataset
+
 class CustomImageDataset:
     def __init__(self, dataset, transform=None):
         self.dataset = dataset
@@ -28,21 +30,6 @@ class CustomImageDataset:
         # y = self.dataset[1][index]
         return x
     
-
-def load_data():
-    from misc_functions import functions
-    fcts = functions() 
-    training_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_his.mat', 
-                              'training_his').astype(np.float16)   
-    testing_data = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_his.mat',
-                             'testing_his').astype(np.float16)
-    training_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat', 'training_targets')
-    testing_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat', 'testing_targets')
-    
-    training_data = training_data.reshape([training_data.shape[0], training_data.shape[1], 1])
-    testing_data = testing_data.reshape([testing_data.shape[0], testing_data.shape[1], 1])
-
-    return training_data, training_targets, testing_data, testing_targets
 
 def load_images():
     fcts = functions()
@@ -72,7 +59,29 @@ class Identity(nn.Module):
         
     def forward(self, x):
         return(x)
+    
+class LSTM(nn.Module):
+    def __init__(self, input_shape):
+        super(LSTM, self).__init__()   
+        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=128, num_layers=3)
+        self.relu = nn.ReLU()
 
+        self.flatten = nn.Flatten()
+        self.decoder = nn.Sequential(
+            nn.Dropout(0.3),
+            nn.Linear(128, 256),
+            nn.ReLU(),
+            nn.Linear(256, 512),
+            nn.ReLU(),
+            nn.Linear(512, 1)
+            )
+        
+    def forward(self, x):
+        x, (hn, cn) = self.lstm(x)
+        x = self.relu(x)
+        x = self.decoder(x)
+        return x
+    
 if __name__ == "__main__":
     ld = functions()
     epochs = 150
@@ -96,17 +105,19 @@ if __name__ == "__main__":
     model = models.alexnet(pretrained=True)
     for param in model.parameters():
         param.requires_grad = False 
-    num_features = model.classifier[1].in_features
-    model.classifier = Identity()
-    model.cuda()
+    num_features = model.classifier[-1].in_features
+    model.classifier[-1] = nn.Linear(num_features, 1000)
+    # model.classifier[-1] = Identity()
     summary(model,(3,224,224))
+    model.cuda()
+    
     
     # Compute the Tl model output to combine the LSTM's output
-    tl_output = torch.empty(1,num_features).cuda()
+    tl_output = torch.empty(1,1000).cuda()
     for i, x in enumerate(train_data): 
         x = x.cuda()
         tl_output = torch.cat((tl_output, model(x)))
-    tl_test = torch.empty(1, num_features).cuda()
+    tl_test = torch.empty(1, 1000).cuda()
     for i, x in enumerate(test_data):
         x = x.cuda()
         tl_test = torch.cat((tl_test, model(x)))
@@ -119,18 +130,7 @@ if __name__ == "__main__":
     
     # Importing the LSTM model
     training_data, training_targets, testing_data, testing_targets = load_data()
-    
-    lstm = keras.Sequential()
-    lstm.add(keras.Input(shape=(training_data.shape[1], 1)))
-    lstm.add(layers.LSTM(512, activation='relu', return_sequences=True, name='lstm_1'))
-    lstm.add(layers.LSTM(256, activation='relu', return_sequences=True, name='lstm_2'))
-    lstm.add(layers.LSTM(128, activation='relu', return_sequences=True, name='lstm_3'))
-    lstm.add(layers.Flatten())
-    lstm.add(layers.Dropout(0.3))
-    lstm.add(layers.Dense(256, activation='relu', name='dense_1'))
-    # model.add(layers.Dense(512, activation='relu', name='dense_2'))
-    lstm.add(layers.Dense(500, activation='relu', name='dense_3'))
-    lstm.add(layers.Dense(1, name='output'))
+    lstm = LSTM(input_shape = 9)
     
     steps_per_epochs = np.ceil(training_data.shape[0] / batch_size)
     lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, 
