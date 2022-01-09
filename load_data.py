@@ -1,10 +1,9 @@
 ### Load Data ###
 from misc_functions import functions
 import numpy as np
-from sklearn.model_selection import train_test_split
 from torchvision import transforms
-from torch.utils.data import DataLoader, Dataset, TensorDataset
-import torch.nn as nn
+from torch.utils.data import DataLoader
+import torch
 
 class data:
     def load_images(train_dataset, train_targets, test_dataset, test_targets, batch_size):
@@ -21,18 +20,24 @@ class data:
         test_loader = DataLoader(test_data, shuffle=True, batch_size=batch_size)
         return train_loader, test_loader
     
-    def load_dataset(batch_size):
-        from skimage import io as skio
-        ld = functions()
+    def load_datasets(batch_size):
+        fcts = functions() 
+        training_data = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_his.mat',
+                                  'training_his').astype(np.float16))
+        testing_data = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_his.mat',
+                                 'testing_his').astype(np.float16))
+        training_targets = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat',
+                                     'training_targets').astype(np.int16))
+        testing_targets = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat',
+                                    'testing_targets').astype(np.int16))
         
-        train_data = skio.imread('./Matlab/train_test_images\\training_data.tif')
-        test_data = skio.imread('./Matlab/train_test_images\\testing_data.tif')
-
-        train_rul = ld.load('./Matlab/train_test_images\\training_targets.mat', 'rul').astype(np.int16)
-        test_rul = ld.load('./Matlab/train_test_images\\testing_targets.mat', 'rul').astype(np.int16)
-
-        train_loader, test_loader = data.load_images(train_data, train_rul, test_data, test_rul, batch_size)
+        training_data = training_data.reshape([training_data.shape[0], 1, training_data.shape[1]])
+        testing_data = testing_data.reshape([testing_data.shape[0], 1, testing_data.shape[1]])
         
+        train_loader = CustomDataset(dataset=(training_data, training_targets))
+        test_loader = CustomDataset(dataset=(testing_data, testing_targets))
+        train_loader = DataLoader(train_loader, shuffle=True, batch_size=batch_size)
+        test_loader = DataLoader(test_loader, shuffle=True, batch_size=batch_size)
         return train_loader, test_loader
     
 class CustomImageDataset:
@@ -50,4 +55,15 @@ class CustomImageDataset:
         y = self.dataset[1][index]
         return x, y
     
+
+class CustomDataset:
+    def __init__(self, dataset):
+        self.dataset = dataset
+        
+    def __len__(self):
+        return len(self.dataset[0])
     
+    def __getitem__(self, index):
+        x = self.dataset[0][index]
+        y = self.dataset[1][index]
+        return x, y

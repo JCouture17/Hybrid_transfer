@@ -6,52 +6,15 @@ import torch
 import torch.nn as nn
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
+# from tensorflow.keras import layers
 import os
-from skimage import io as skio
+# from skimage import io as skio
 from misc_functions import functions
-from torchvision import transforms
-from torch.utils.data import DataLoader
+# from torchvision import transforms
+# from torch.utils.data import DataLoader
 
-from LSTM import load_data, CustomDataset
-
-class CustomImageDataset:
-    def __init__(self, dataset, transform=None):
-        self.dataset = dataset
-        self.transform = transform
-        
-    def __len__(self):
-        return len(self.dataset[0])
-    
-    def __getitem__(self, index):
-        x = self.dataset[0][index]
-        if self.transform:
-            x = self.transform(x)
-        # y = self.dataset[1][index]
-        return x
-    
-
-def load_images():
-    fcts = functions()
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                              std=[0.229, 0.224, 0.225])
-        ])
-    train_data = skio.imread('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_data.tif')
-    test_data = skio.imread('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_dataset.tif')
-
-    train_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat', 'training_targets').astype(np.int16)
-    test_targets = fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat', 'testing_targets').astype(np.int16)
-    
-    train_data = CustomImageDataset(dataset=(train_data, train_targets), transform=transform)
-    test_data = CustomImageDataset(dataset=(test_data, test_targets), transform=transform)
-    # Build dataloader
-    train_loader = DataLoader(train_data, shuffle=False, batch_size=1)
-    test_loader = DataLoader(test_data, shuffle=False, batch_size=1)
-    
-    return train_loader, test_loader
-
+from LSTM import MyModel
+from load_data import data
 
 class Identity(nn.Module):
     def __init__(self):
@@ -60,10 +23,10 @@ class Identity(nn.Module):
     def forward(self, x):
         return(x)
     
-class LSTM(nn.Module):
-    def __init__(self, input_shape):
-        super(LSTM, self).__init__()   
-        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=128, num_layers=3)
+class HybridModel(nn.Module):
+    def __init__(self):
+        super(HybridModel, self).__init__()
+        self.lstm = nn.LSTM(input_size=9, hidden_size=128, num_layers=3)
         self.relu = nn.ReLU()
 
         self.flatten = nn.Flatten()
@@ -73,13 +36,17 @@ class LSTM(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 512),
             nn.ReLU(),
-            nn.Linear(512, 1)
+            nn.Linear(512, 128)
             )
         
-    def forward(self, x):
+        self.transfer
+        
+    def forward(self, x, y):
         x, (hn, cn) = self.lstm(x)
         x = self.relu(x)
         x = self.decoder(x)
+        
+        
         return x
     
 if __name__ == "__main__":
@@ -100,7 +67,7 @@ if __name__ == "__main__":
     '''
     
     ## Loading the transferred network and data
-    train_data, test_data = load_images()
+    train_data, test_data = data.load_images()
     
     model = models.alexnet(pretrained=True)
     for param in model.parameters():
@@ -110,7 +77,6 @@ if __name__ == "__main__":
     # model.classifier[-1] = Identity()
     summary(model,(3,224,224))
     model.cuda()
-    
     
     # Compute the Tl model output to combine the LSTM's output
     tl_output = torch.empty(1,1000).cuda()
@@ -129,7 +95,7 @@ if __name__ == "__main__":
     
     
     # Importing the LSTM model
-    training_data, training_targets, testing_data, testing_targets = load_data()
+    training_data, training_targets, testing_data, testing_targets = data.load_datasets()
     lstm = LSTM(input_shape = 9)
     
     steps_per_epochs = np.ceil(training_data.shape[0] / batch_size)

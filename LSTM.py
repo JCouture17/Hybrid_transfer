@@ -1,39 +1,15 @@
 ### LSTM ###
-import numpy as np
 from train import train, EarlyStopping
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader
 import torch
 from torch import nn
 from time import time
 from torch.optim import Adam, lr_scheduler
 import copy    
 
-def load_data(batch_size):
-    from misc_functions import functions
-    fcts = functions() 
-    training_data = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_his.mat',
-                              'training_his').astype(np.float16))
-    testing_data = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_his.mat',
-                             'testing_his').astype(np.float16))
-    training_targets = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/training_targets.mat',
-                                 'training_targets').astype(np.int16))
-    testing_targets = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat',
-                                'testing_targets').astype(np.int16))
-    
-    training_data = training_data.reshape([training_data.shape[0], 1, training_data.shape[1]])
-    testing_data = testing_data.reshape([testing_data.shape[0], 1, testing_data.shape[1]])
-    
-    
-    train_loader = CustomDataset(dataset=(training_data, training_targets))
-    test_loader = CustomDataset(dataset=(testing_data, testing_targets))
-    
-    train_loader = DataLoader(train_loader, shuffle=True, batch_size=batch_size)
-    test_loader = DataLoader(test_loader, shuffle=True, batch_size=batch_size)
+from load_data import data
 
-    return train_loader, test_loader
-
-class MyModel(nn.Module):
+class MyModel(nn.Module): 
     def __init__(self, input_shape):
         super(MyModel, self).__init__()   
         self.lstm = nn.LSTM(input_size=input_shape, hidden_size=128, num_layers=3)
@@ -102,24 +78,13 @@ def train_model(train_loader, test_loader, lr, epochs, model, early_stop=5, opt=
     
     return model, train_loss, val_loss
 
-class CustomDataset:
-    def __init__(self, dataset):
-        self.dataset = dataset
-        
-    def __len__(self):
-        return len(self.dataset[0])
-    
-    def __getitem__(self, index):
-        x = self.dataset[0][index]
-        y = self.dataset[1][index]
-        return x, y
 
 if __name__ == "__main__":
     epochs = 50
     batch_size = 256
     learning_rate = 0.0001
     early_stop = 5
-    train_loader, test_loader = load_data(batch_size)
+    train_loader, test_loader = data.load_datasets(batch_size)
     LSTM = MyModel(input_shape=9)
     LSTM.cuda()
     
