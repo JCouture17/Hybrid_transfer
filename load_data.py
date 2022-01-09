@@ -31,8 +31,18 @@ class data:
         testing_targets = torch.tensor(fcts.load('/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/testing_targets.mat',
                                     'testing_targets').astype(np.int16))
         
+<<<<<<< Updated upstream
         training_data = training_data.reshape([training_data.shape[0], 1, training_data.shape[1]])
         testing_data = testing_data.reshape([testing_data.shape[0], 1, testing_data.shape[1]])
+=======
+        train_data = skio.imread('./Data/training_data.tif')
+        test_data = skio.imread('./Data/testing_dataset.tif')
+
+        train_rul = ld.load('./Data/training_targets.mat', 'training_targets').astype(np.int16)
+        test_rul = ld.load('./Data/testing_targets.mat', 'testing_targets').astype(np.int16)
+
+        train_loader, test_loader = data.load_images(train_data, train_rul, test_data, test_rul, batch_size)
+>>>>>>> Stashed changes
         
         train_loader = CustomDataset(dataset=(training_data, training_targets))
         test_loader = CustomDataset(dataset=(testing_data, testing_targets))

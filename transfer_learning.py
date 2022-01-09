@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
     
 if __name__ == "__main__":
     # User inputs
-    epochs = 100
-    batch_size = 256
+    epochs = 50
+    batch_size = 4
     lr = 0.001
     early_stop = 8
     neural_net = 'alexnet'
@@ -18,7 +18,7 @@ if __name__ == "__main__":
         - googlenet;
         - alexnet
     '''
-    
+     
     # Load the data
     training, testing = data.load_dataset(batch_size)
     

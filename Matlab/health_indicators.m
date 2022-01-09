@@ -68,7 +68,7 @@ data(1:5:end,:) = [];
 % Qd; Time between voltages; Qd_d; Qc_d; IR; Tavg; Tmax
 summary = data.summary;
 cycles = data.cycles;
-cycle = 3;
+cycle = 5;
 r = [];
 b = [];
 for i = 1:height(data) % For each battery

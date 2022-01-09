@@ -73,7 +73,7 @@ if __name__ == "__main__":
     for param in model.parameters():
         param.requires_grad = False 
     num_features = model.classifier[-1].in_features
-    model.classifier[-1] = nn.Linear(num_features, 1000)
+    model.classifier[-1] = nn.Linear(num_features, 512)
     # model.classifier[-1] = Identity()
     summary(model,(3,224,224))
     model.cuda()

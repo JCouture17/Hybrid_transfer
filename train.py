@@ -114,9 +114,15 @@ class train:
             # gather statistics
             avg_loss += loss.item()        
             mae += torch.sum((abs(output - labels)))
+            # print('outputs ', output)
+            # print('labels ', labels)
+            # print('mae ', torch.sum((abs(output - labels))))
             se += torch.sum((abs(output - labels))**2)
+            # print('se ', torch.sum((abs(output - labels))**2))
             absolute_percentage_error += train.mape(labels, output)
-        rmse = ((se/(len(val_loader.dataset)))**0.5)
+            # print('ape ', train.mape(labels, output))
+            # print('mse loss ', loss.item())
+        rmse = (avg_loss / len(val_loader.dataset))**0.5
         return {'loss' : avg_loss / len(val_loader.dataset), 'accuracy' : 100-(absolute_percentage_error / len(val_loader.dataset)),
                 'MAE' : mae / len(val_loader.dataset), 'RMSE' : rmse}
     
