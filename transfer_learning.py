@@ -23,7 +23,7 @@ if __name__ == "__main__":
     training, testing = data.load_dataset(batch_size)
     
     # Train the model on the training data
-    model, train_loss, val_loss = train.train_model(training, testing, 
+    model, train_loss, val_loss = train.train_transfer_network(training, testing, 
                     lr=lr, epochs=epochs, model_name = neural_net, 
                     early_stop=early_stop)
     
