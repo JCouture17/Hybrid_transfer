@@ -1,7 +1,7 @@
 %% Combine datasets
 clear; clc;
 
-path = '/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/';
+path = '.\Data\';
 
 %% Training images
 t1 = loadtiff(append(path, 'train_data1.tif'));
@@ -33,8 +33,8 @@ save(append(path, 'training_targets.mat'), 'training_targets');
 %% Testing images
 t1 = loadtiff(append(path, 'test_data1.tif'));
 t2 = loadtiff(append(path, 'test_data2.tif'));
-r1 = load(append(path, '/split_datasets/test_rul1.mat')).rul;
-r2 = load(append(path, '/split_datasets/test_rul2.mat')).rul;
+r1 = load(append(path, 'test_rul1.mat')).rul;
+r2 = load(append(path, 'test_rul2.mat')).rul;
 
 testing_dataset = cat(4, t1, t2);
 testing_targets = cat(1, r1, r2);

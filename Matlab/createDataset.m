@@ -64,7 +64,7 @@ test = data(1:5:end,:);
 data(1:5:end,:) = [];
 
 %% Image as Inputs
-folder = '/home/jonathan/Documents/GitHub/Hybrid_transfer/Data/';
+folder = 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\';
 cycle_count = 5;
 
 make_image(data(1:10,:), cycle_count, append(folder, 'train_data1.tif'), append(folder, 'train_rul1.mat'),...

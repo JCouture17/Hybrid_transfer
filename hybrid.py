@@ -65,6 +65,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
     early_stop = 5
     model_name = 'alexnet'
+    
     '''
     Available models:
         - resnet18;

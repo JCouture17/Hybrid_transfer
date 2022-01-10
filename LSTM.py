@@ -1,13 +1,7 @@
 ### LSTM ###
-from train import train, EarlyStopping
-import matplotlib.pyplot as plt
-import torch
-from torch import nn
-from time import time
-from torch.optim import Adam, lr_scheduler
-import copy    
-
 from train import train
+import matplotlib.pyplot as plt
+from torch import nn
 from load_data import data
 
 class MyModel(nn.Module): 
@@ -31,17 +25,14 @@ class MyModel(nn.Module):
         x = self.relu(x)
         x = self.decoder(x)
         return x
-    
-
-
 
 if __name__ == "__main__":
     epochs = 50
     batch_size = 256
-    learning_rate = 0.0001
+    learning_rate = 0.001
     early_stop = 5
     train_loader, test_loader = data.load_datasets(batch_size)
-    LSTM = MyModel(input_shape=9)
+    LSTM = MyModel(input_shape=8)
     LSTM.cuda()
     
     model, train_loss, val_loss = train.train_lstm(train_loader=train_loader, 
