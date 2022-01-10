@@ -7,17 +7,17 @@ from load_data import data
 class MyModel(nn.Module): 
     def __init__(self, input_shape):
         super(MyModel, self).__init__()   
-        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=128, num_layers=3)
+        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=256, num_layers=3)
         self.relu = nn.ReLU()
 
         self.flatten = nn.Flatten()
         self.decoder = nn.Sequential(
             nn.Dropout(0.3),
-            nn.Linear(128, 256),
-            nn.ReLU(),
             nn.Linear(256, 512),
             nn.ReLU(),
-            nn.Linear(512, 1)
+            nn.Linear(512, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 1)
             )
         
     def forward(self, x):

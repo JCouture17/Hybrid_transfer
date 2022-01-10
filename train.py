@@ -56,7 +56,7 @@ class train:
         t0 = time()
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
-        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
         train_images, train_his, testing_images, testing_his = training[0], training[1], testing[0], testing[1]
         # Loss Criterion
         criterion = nn.MSELoss()
@@ -80,7 +80,8 @@ class train:
                 print('RMSE = ', float(valid_stats['RMSE']))
                 print('MAE = ', float(valid_stats['MAE']))
                 best_model_weights = copy.deepcopy(model.state_dict())
-            lr_decay.step()
+            if epoch % 5 == 0:
+                lr_decay.step()
             early_stopping(val_loss)
             if early_stopping.early_stop:
                 print("Early stopping")
@@ -99,7 +100,7 @@ class train:
         t0 = time()
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
-        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
         # Loss Criterion
         criterion = nn.MSELoss()
         train_loss = []
@@ -122,7 +123,8 @@ class train:
                 print('RMSE = ', float(valid_stats['RMSE']))
                 print('MAE = ', float(valid_stats['MAE']))
                 best_model_weights = copy.deepcopy(model.state_dict())
-            lr_decay.step()
+            if epoch % 5 == 0: # Decay the learning rate every 5 epochs
+                lr_decay.step()
             early_stopping(val_loss)
             if early_stopping.early_stop:
                 print("Early stopping")
@@ -145,7 +147,7 @@ class train:
         model = transfer_model.load_model(model_name)
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
-        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99, step_size=5)
         train_loader, test_loader = training, validation      
         # Loss Criterion
         criterion = nn.MSELoss()
@@ -169,7 +171,8 @@ class train:
                 print('RMSE = ', float(valid_stats['RMSE']))
                 print('MAE = ', float(valid_stats['MAE']))
                 best_model_weights = copy.deepcopy(model.state_dict())
-            lr_decay.step()
+            if epoch % 5 == 0:    
+                lr_decay.step()
             early_stopping(val_loss)
             if early_stopping.early_stop:
                 print("Early stopping")
