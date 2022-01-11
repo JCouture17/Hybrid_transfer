@@ -146,7 +146,7 @@ class train:
         model = transfer_model.load_model(model_name)
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
-        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99, step_size=5)
+        lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
         train_loader, test_loader = training, validation      
         # Loss Criterion
         criterion = nn.MSELoss()
@@ -276,10 +276,12 @@ class train:
         absolute_percentage_error = 0.0
         dataloader_iter = iter(train_images) # Image dataset
         for i, (x_his, labels) in enumerate(train_his):
+            # print('Health indicator labels: ', labels)
             try:
                 (x_images, labels) = next(dataloader_iter)
             except StopIteration:
                 print("Something doesn't work")
+            # print('Images labels: ', labels)
             x_his, x_images, labels = x_his.float().cuda(), x_images.cuda(), labels.cuda()
             optimizer.zero_grad()
             # forward pass

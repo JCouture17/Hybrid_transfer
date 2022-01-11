@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
     
 if __name__ == "__main__":
     # User inputs
-    epochs = 50
-    batch_size = 4
+    epochs = 150
+    batch_size = 150
     lr = 0.001
-    early_stop = 8
+    early_stop = 5
     neural_net = 'alexnet'
     '''
     Available models:
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     '''
      
     # Load the data
-    training, testing = data.load_dataset(batch_size)
+    training, testing = data.load_data(batch_size)
     
     # Train the model on the training data
     model, train_loss, val_loss = train.train_transfer_network(training, testing, 
