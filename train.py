@@ -278,7 +278,7 @@ class train:
                 (x_images, labels) = next(dataloader_iter)
             except StopIteration:
                 print("Something doesn't work")
-            x_his, x_images, labels = x_his.cuda(), x_images.cuda(), labels.cuda()
+            x_his, x_images, labels = x_his.float().cuda(), x_images.cuda(), labels.cuda()
             optimizer.zero_grad()
             # forward pass
             pred = model(x_his, x_images)
@@ -301,7 +301,7 @@ class train:
                 (x_images, labels) = next(dataloader_iter)
             except StopIteration:
                 print("Something doesn't work")
-            x_his, x_images, labels = x_his.cuda(), x_images.cuda(), labels.cuda()
+            x_his, x_images, labels = x_his.float().cuda(), x_images.cuda(), labels.cuda()
             # forward pass
             output = model(x_his, x_images)
             loss = criterion(output, labels)

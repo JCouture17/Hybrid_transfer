@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 # import numpy as np
 # from torchvision import models
-# from torchsummary import summary
+from torchsummary import summary
 import torch
 import torch.nn as nn
 # import os
@@ -28,6 +28,7 @@ class HybridModel(nn.Module):
         self.lstm.decoder[5] = Identity()
         self.lstm.eval()
         self.lstm.cuda()
+        self.flatten = nn.Flatten()
         
         ### Transfer Learning Network ###
         self.transfer_network = transfer_model.load_model(model_name)
@@ -47,8 +48,9 @@ class HybridModel(nn.Module):
         
     def forward(self, x, y):
         x = self.lstm(x)
+        x = self.flatten(x)
         y = self.transfer_network(y)
-        z = torch.cat(x, y)
+        z = torch.cat((x, y), 1)
         z = self.linear1(z)
         z = self.relu(z)
         z = self.linear2(z)
@@ -79,9 +81,12 @@ if __name__ == "__main__":
     ## Loading the data
     train_images, test_images = data.load_data(batch_size)
     train_his, test_his = data.load_datasets(batch_size)
-    training, testing = [train_images, train_his], [test_images, test_his]
     hybrid = HybridModel('alexnet')
-    model, train_loss, val_loss = train.train_hybrid(hybrid, training, testing, learning_rate, epochs) 
+    hybrid.cuda()
+    summary(hybrid)
+    model, train_loss, val_loss = train.train_hybrid(hybrid, train_his, test_his, 
+                                                     train_images, test_images, 
+                                                     learning_rate, epochs) 
     
     # Plot training and validation loss over time
     plt.plot(train_loss, label='training loss')
