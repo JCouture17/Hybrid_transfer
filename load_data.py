@@ -16,8 +16,8 @@ class data:
         train_data = CustomImageDataset(dataset=(train_dataset, train_targets), transform=transform)
         test_data = CustomImageDataset(dataset=(test_dataset, test_targets), transform=transform)
         # Build dataloader
-        train_loader = DataLoader(train_data, shuffle=False, batch_size=batch_size)
-        test_loader = DataLoader(test_data, shuffle=False, batch_size=batch_size)
+        train_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size)
+        test_loader = DataLoader(test_data, shuffle=True, batch_size=batch_size)
         return train_loader, test_loader
     
     def load_data(batch_size):
@@ -46,8 +46,8 @@ class data:
         
         train_loader = CustomDataset(dataset=(training_data, training_targets))
         test_loader = CustomDataset(dataset=(testing_data, testing_targets))
-        train_loader = DataLoader(train_loader, shuffle=False, batch_size=batch_size)
-        test_loader = DataLoader(test_loader, shuffle=False, batch_size=batch_size)
+        train_loader = DataLoader(train_loader, shuffle=True, batch_size=batch_size)
+        test_loader = DataLoader(test_loader, shuffle=True, batch_size=batch_size)
         return train_loader, test_loader
     
 class CustomImageDataset:

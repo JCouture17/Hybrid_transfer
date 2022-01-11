@@ -8,7 +8,8 @@ from load_data import data
 class MyModel(nn.Module): 
     def __init__(self, input_shape):
         super(MyModel, self).__init__()   
-        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=256, num_layers=3)
+        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=256, 
+                            num_layers=3)
         self.relu = nn.ReLU()
 
         self.flatten = nn.Flatten()
@@ -16,8 +17,10 @@ class MyModel(nn.Module):
             nn.Dropout(0.3),
             nn.Linear(256, 512),
             nn.ReLU(),
+            # nn.Dropout(0.1),
             nn.Linear(512, 1024),
             nn.ReLU(),
+            # nn.Dropout(0.1),
             nn.Linear(1024, 1)
             )
         
@@ -30,9 +33,9 @@ class MyModel(nn.Module):
 if __name__ == "__main__":
     epochs = 500
     batch_size = 256
-    learning_rate = 0.001
+    learning_rate = 0.0001
     early_stop = 5
-    transfer = 'y'
+    transfer = 'n'
     train_loader, test_loader = data.load_datasets(batch_size)
     LSTM = MyModel(input_shape=8)
     LSTM.cuda()
