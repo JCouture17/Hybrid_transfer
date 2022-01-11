@@ -27,7 +27,7 @@ class MyModel(nn.Module):
         return x
 
 if __name__ == "__main__":
-    epochs = 50
+    epochs = 500
     batch_size = 256
     learning_rate = 0.001
     early_stop = 5

@@ -52,12 +52,11 @@ class train:
         mape = (torch.sum(torch.div(torch.abs(torch.sub(y_true, y_pred)), torch.abs(y_true))))*100
         return mape
     
-    def train_hybrid(model, training, testing, lr, epochs, early_stop=5, opt='Adam'):
+    def train_hybrid(model, train_his, test_his, train_images, test_images, lr, epochs, early_stop=5, opt='Adam'):
         t0 = time()
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
         lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
-        train_images, train_his, testing_images, testing_his = training[0], training[1], testing[0], testing[1]
         # Loss Criterion
         criterion = nn.MSELoss()
         train_loss = []
@@ -68,7 +67,7 @@ class train:
             # Train and Validate
             print('epoch:', epoch)
             train_stats = train.train_hybrid_step(model, criterion, optimizer, train_his, train_images)
-            valid_stats = train.valid_hybrid_step(model, criterion, testing_his, testing_images)
+            valid_stats = train.valid_hybrid_step(model, criterion, test_his, test_images)
             train_loss.append(train_stats['loss'])
             val_loss.append(valid_stats['loss'])
             # Keep best model
@@ -89,7 +88,7 @@ class train:
             print('Time taken for epoch = %ds' % (time() - t1))
         # Load best model and evaluate on test set
         model.load_state_dict(best_model_weights)
-        test_stats = train.valid_hybrid_step(model, criterion, testing_his, testing_images)
+        test_stats = train.valid_hybrid_step(model, criterion, test_his, test_images)
         print("Total time = %ds" % (time() - t0))
         # print('\nBests Model Accuracies: Train: {:4.2f} | Val: {:4.2f} | Test: {:4.2f}'.format(best_train, best_val, test_stats['accuracy']))
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
@@ -273,7 +272,12 @@ class train:
         model.train()
         avg_loss = 0.0
         absolute_percentage_error = 0.0
-        for i, (x_his, labels, x_images, labels) in enumerate(train_his, train_images):
+        dataloader_iter = iter(train_images) # Image dataset
+        for i, (x_his, labels) in enumerate(train_his):
+            try:
+                (x_images, labels) = next(dataloader_iter)
+            except StopIteration:
+                print("Something doesn't work")
             x_his, x_images, labels = x_his.cuda(), x_images.cuda(), labels.cuda()
             optimizer.zero_grad()
             # forward pass
@@ -291,7 +295,12 @@ class train:
         avg_loss = 0.0
         absolute_percentage_error = 0.0
         mae, se = 0.0, 0.0
-        for i, (x_his, labels, x_images, labels) in enumerate(test_his, test_images):
+        dataloader_iter = iter(test_images)
+        for i, (x_his, labels) in enumerate(test_his):
+            try:
+                (x_images, labels) = next(dataloader_iter)
+            except StopIteration:
+                print("Something doesn't work")
             x_his, x_images, labels = x_his.cuda(), x_images.cuda(), labels.cuda()
             # forward pass
             output = model(x_his, x_images)

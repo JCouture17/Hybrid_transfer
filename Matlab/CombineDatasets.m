@@ -1,7 +1,7 @@
 %% Combine datasets
 clear; clc;
 
-path = '.\Data\';
+path = 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\SplitDatasets\';
 
 %% Training images
 t1 = loadtiff(append(path, 'train_data1.tif'));
@@ -27,7 +27,7 @@ training_targets = cat(1, r1, r2, r3, r4, r5, r6, r7, r8);
 options.append = true;
 options.color = true;
 options.compress = 'lzw';
-saveastiff(training_dataset, append(path, 'training_data.tif'), options);
+saveastiff(training_dataset, 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\training_data.tif', options);
 save(append(path, 'training_targets.mat'), 'training_targets');
 
 %% Testing images
