@@ -319,3 +319,13 @@ class train:
         criterion = nn.MSELoss()
         test_stats = train.valid_step(model, criterion, test_loader)
         return test_stats
+    
+    def test_lstm(model, test_loader):
+        criterion = nn.MSELoss()
+        test_stats = train.valid_lstm_step(model, criterion, test_loader)
+        return test_stats
+    
+    def test_hybrid(model, test_loader):
+        criterion = nn.MSELoss()
+        test_stats = train.valid_hybrid_step(model, criterion, test_loader)
+        return test_stats
