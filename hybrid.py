@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
-# import numpy as np
-# from torchvision import models
 from torchsummary import summary
 import torch
 import torch.nn as nn
-# import os
 
 from train import train
 from misc_functions import functions
