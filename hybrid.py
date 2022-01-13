@@ -20,7 +20,7 @@ class HybridModel(nn.Module):
     def __init__(self, model_name):
         super(HybridModel, self).__init__()
         ### LSTM Network ###
-        self.lstm = MyModel(input_shape = 8)
+        self.lstm = MyModel(input_shape = 12)
         self.lstm.load_state_dict(torch.load('./result/trained_lstm.pkl'))
         for param in self.lstm.parameters():
             param.requires_grad = False

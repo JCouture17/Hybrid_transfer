@@ -51,7 +51,7 @@ if __name__ == "__main__":
     early_stop = 5
     transfer = 'y'
     train_loader, test_loader = data.load_datasets(batch_size)
-    LSTM = MyModel(input_shape=8)
+    LSTM = MyModel(input_shape=12)
     LSTM.cuda()
     
     if transfer == 'n':

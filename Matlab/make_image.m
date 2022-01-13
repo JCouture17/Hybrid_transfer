@@ -16,8 +16,8 @@ for i = 1:height(data) % For each battery
     tavg = summary(i,:).Tavg;
     for j = cycle+1:length(a)-cycle % For each cycle of each battery
         %% Making the image dataset
-        close all
-        recording_length = min(length(a(j).I), length(a(j+cycle-1).I));
+%         close all
+%         recording_length = min(length(a(j).I), length(a(j+cycle-1).I));
 %         I = [a(j).I(1:recording_length) a(j+cycle-1).I(1:recording_length)];
 %         V = [a(j).V(1:recording_length) a(j+cycle-1).V(1:recording_length)];
 %         Qc = [a(j).Qc(1:recording_length) a(j+cycle-1).Qc(1:recording_length)];

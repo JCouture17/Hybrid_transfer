@@ -1,7 +1,7 @@
 %% Combine datasets
 clear; clc;
 
-path = 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\SplitDatasets\';
+path = 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\';
 
 %% Training images
 t1 = loadtiff(append(path, 'train_data1.tif'));
