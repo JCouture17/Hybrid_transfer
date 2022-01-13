@@ -93,6 +93,9 @@ class train:
         # print('\nBests Model Accuracies: Train: {:4.2f} | Val: {:4.2f} | Test: {:4.2f}'.format(best_train, best_val, test_stats['accuracy']))
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
+        save_dir = "./result"
+        torch.save(model.state_dict(), save_dir + '/trained_hybrid.pkl') # Use this to save the model to a .pkl file
+        print('Trained model saved to \'%s/trained_hybrid.pkl\'' % save_dir)
         return model, train_loss, val_loss
     
     def train_lstm(train_loader, test_loader, lr, epochs, model, early_stop=5, opt='Adam'):
@@ -138,7 +141,7 @@ class train:
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
         torch.save(model.state_dict(), save_dir + '/trained_lstm.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_model.h5\'' % save_dir)
+        print('Trained model saved to \'%s/trained_lstm.pkl\'' % save_dir)
         return model, train_loss, val_loss    
         
     def train_transfer_network(training, validation, lr, epochs, model_name, early_stop=5, opt='Adam'):

@@ -8,32 +8,46 @@ from load_data import data
 class MyModel(nn.Module): 
     def __init__(self, input_shape):
         super(MyModel, self).__init__()   
-        self.lstm = nn.LSTM(input_size=input_shape, hidden_size=256, 
-                            num_layers=3)
-        self.relu = nn.ReLU()
+        # self.lstm = nn.LSTM(input_size=input_shape, hidden_size=512, 
+        #                     num_layers=3, dropout=0.1)
+        # self.relu = nn.ReLU()
 
-        self.flatten = nn.Flatten()
-        self.decoder = nn.Sequential(
-            nn.Dropout(0.3),
-            nn.Linear(256, 512),
+        # self.flatten = nn.Flatten()
+        # self.decoder = nn.Sequential(
+        #     nn.Dropout(0.1),
+        #     nn.Linear(512, 1024),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+        #     nn.Linear(1024, 128),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+        #     nn.Linear(128, 1)
+        #     )
+        
+        self.fc = nn.Sequential(
+            nn.Linear(input_shape, 2048),
             nn.ReLU(),
-            # nn.Dropout(0.1),
-            nn.Linear(512, 1024),
+            nn.Dropout(0.1),
+            nn.Linear(2048, 512),
             nn.ReLU(),
-            # nn.Dropout(0.1),
-            nn.Linear(1024, 1)
+            nn.Dropout(0.1),
+            nn.Linear(512, 128),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(128, 1)
             )
         
     def forward(self, x):
-        x, (hn, cn) = self.lstm(x)
-        x = self.relu(x)
-        x = self.decoder(x)
+        # x, (hn, cn) = self.lstm(x)
+        # x = self.relu(x)
+        # x = self.decoder(x)
+        x = self.fc(x)
         return x
 
 if __name__ == "__main__":
     epochs = 500
     batch_size = 256
-    learning_rate = 0.0001
+    learning_rate = 0.001
     early_stop = 5
     transfer = 'y'
     train_loader, test_loader = data.load_datasets(batch_size)

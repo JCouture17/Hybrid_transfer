@@ -22,8 +22,10 @@ class HybridModel(nn.Module):
         ### LSTM Network ###
         self.lstm = MyModel(input_shape = 8)
         self.lstm.load_state_dict(torch.load('./result/trained_lstm.pkl'))
-        self.lstm.decoder[5] = Identity()
-        self.lstm.eval()
+        for param in self.lstm.parameters():
+            param.requires_grad = False
+        self.lstm.fc[9] = Identity()
+        # self.lstm.eval()
         self.lstm.cuda()
         self.flatten = nn.Flatten()
         
@@ -32,35 +34,38 @@ class HybridModel(nn.Module):
         for param in self.transfer_network.parameters():
             param.requires_grad = False 
         num_features = self.transfer_network.classifier[-1].in_features
-        # model.classifier[-1] = nn.Linear(num_features, 512)
-        self.transfer_network.classifier[-1] = Identity()
+        self.transfer_network.classifier[-1] = nn.Linear(num_features, 256)
+        # self.transfer_network.classifier[-1] = Identity()
         self.transfer_network.cuda()
         
         ### Hybrid Fully-Connected Layers ###
-        self.linear1 = nn.Linear(num_features+1024, 2048)
-        self.linear2 = nn.Linear(2048, 512)
-        self.linear3 = nn.Linear(512, 128)
+        self.linear1 = nn.Linear(256+128, 1024)
+        self.linear2 = nn.Linear(1024, 128)
+        # self.linear3 = nn.Linear(512, 128)
         self.output = nn.Linear(128, 1)
         self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.1)
         
     def forward(self, x, y):
         x = self.lstm(x)
         x = self.flatten(x)
         y = self.transfer_network(y)
         z = torch.cat((x, y), 1)
+        z = self.dropout(z)
         z = self.linear1(z)
         z = self.relu(z)
+        z = self.dropout(z)
         z = self.linear2(z)
         z = self.relu(z)
-        z = self.linear3(z)
-        z = self.relu(z)
+        # z = self.linear3(z)
+        # z = self.relu(z)
         z = self.output(z)
         return z
     
 if __name__ == "__main__":
     ld = functions()
-    epochs = 150
-    batch_size = 150
+    epochs = 500
+    batch_size = 256
     learning_rate = 0.001
     early_stop = 5
     model_name = 'alexnet'
