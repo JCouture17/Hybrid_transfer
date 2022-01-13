@@ -118,6 +118,16 @@ for i = 1:height(data) % For each battery
     m = m + c;
 end
 
+corr_Vdlin = [];
+for i = 1:height(data)
+    mean_Vdlin = mean(cell2mat(data(i,:).Vdlin));
+    max_Vdlin = max(cell2mat(data(i,:).Vdlin));
+    min_Vdlin = min(cell2mat(data(i,:).Vdlin));
+    std_Vdlin = std(cell2mat(data(i,:).Vdlin));
+    cycle_life = data(i).cycle_life;
+    corr_Vdlin = [corr_Vdlin; corrcoef([cycle_life mean_Vdlin max_Vdlin min_Vdlin std_Vdlin])];
+end
+
 m = m/height(data);
 
 corr = mean(abs(r));

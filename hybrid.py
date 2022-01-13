@@ -39,8 +39,8 @@ class HybridModel(nn.Module):
         self.transfer_network.cuda()
         
         ### Hybrid Fully-Connected Layers ###
-        self.linear1 = nn.Linear(256+128, 1024)
-        self.linear2 = nn.Linear(1024, 128)
+        self.linear1 = nn.Linear(256+128, 512)
+        self.linear2 = nn.Linear(512, 128)
         # self.linear3 = nn.Linear(512, 128)
         self.output = nn.Linear(128, 1)
         self.relu = nn.ReLU()
