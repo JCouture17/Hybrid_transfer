@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
     # User inputs
     epochs = 150
-    batch_size = 150
+    batch_size = 512
     lr = 0.001
     early_stop = 5
     neural_net = 'alexnet'

@@ -36,10 +36,12 @@ class HybridModel(nn.Module):
         try:
             num_features = self.transfer_network.classifier[-1].in_features
             self.transfer_network.classifier[-1] = nn.Linear(num_features, 256)
+            # self.transfer_network.classifier[-1] = Identity()
         except:
             num_features = self.transfer_network.fc[-1].in_features
             self.transfer_network.fc[-1] = nn.Linear(num_features, 256)
-        # self.transfer_network.classifier[-1] = Identity()
+            # self.transfer_network.fc[-1] = Identity()
+        
         self.transfer_network.cuda()
         
         ### Hybrid Fully-Connected Layers ###
@@ -70,9 +72,9 @@ if __name__ == "__main__":
     ld = functions()
     epochs = 500
     batch_size = 512
-    learning_rate = 0.0001
+    learning_rate = 0.001
     early_stop = 5
-    model_name = 'resnet18'
+    model_name = 'alexnet'
     
     '''
     Available models:

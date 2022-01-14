@@ -240,7 +240,7 @@ class train:
             optimizer.zero_grad()
             # forward pass
             pred = model(x_his)
-            pred = torch.squeeze(pred, 2)
+            # pred = torch.squeeze(pred, 2)
             loss = criterion(pred, labels.float())
             loss.backward()
             optimizer.step()
@@ -261,7 +261,7 @@ class train:
             x_his, labels = x_his.float().cuda(), labels.cuda()
             # forward pass
             output = model(x_his)
-            output = torch.squeeze(output, 2)
+            # output = torch.squeeze(output, 2)
             loss = criterion(output, labels)
             # gather statistics
             avg_loss += loss.item()        
