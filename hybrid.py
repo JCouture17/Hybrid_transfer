@@ -33,16 +33,20 @@ class HybridModel(nn.Module):
         self.transfer_network = transfer_model.load_model(model_name)
         for param in self.transfer_network.parameters():
             param.requires_grad = False 
-        num_features = self.transfer_network.classifier[-1].in_features
-        self.transfer_network.classifier[-1] = nn.Linear(num_features, 256)
+        try:
+            num_features = self.transfer_network.classifier[-1].in_features
+            self.transfer_network.classifier[-1] = nn.Linear(num_features, 256)
+        except:
+            num_features = self.transfer_network.fc[-1].in_features
+            self.transfer_network.fc[-1] = nn.Linear(num_features, 256)
         # self.transfer_network.classifier[-1] = Identity()
         self.transfer_network.cuda()
         
         ### Hybrid Fully-Connected Layers ###
-        self.linear1 = nn.Linear(256+128, 512)
-        self.linear2 = nn.Linear(512, 128)
+        self.linear1 = nn.Linear(256+128, 1)
+        # self.linear2 = nn.Linear(512, 256)
         # self.linear3 = nn.Linear(512, 128)
-        self.output = nn.Linear(128, 1)
+        # self.output = nn.Linear(256, 1)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.1)
         
@@ -51,24 +55,24 @@ class HybridModel(nn.Module):
         x = self.flatten(x)
         y = self.transfer_network(y)
         z = torch.cat((x, y), 1)
-        z = self.dropout(z)
+        # z = self.dropout(z)
         z = self.linear1(z)
-        z = self.relu(z)
-        z = self.dropout(z)
-        z = self.linear2(z)
-        z = self.relu(z)
+        # z = self.relu(z)
+        # z = self.dropout(z)
+        # z = self.linear2(z)
+        # z = self.relu(z)
         # z = self.linear3(z)
         # z = self.relu(z)
-        z = self.output(z)
+        # z = self.output(z)
         return z
     
 if __name__ == "__main__":
     ld = functions()
     epochs = 500
-    batch_size = 256
-    learning_rate = 0.001
+    batch_size = 512
+    learning_rate = 0.0001
     early_stop = 5
-    model_name = 'alexnet'
+    model_name = 'resnet18'
     
     '''
     Available models:
@@ -83,7 +87,7 @@ if __name__ == "__main__":
     ## Loading the data
     train_images, test_images = data.load_data(batch_size)
     train_his, test_his = data.load_datasets(batch_size)
-    hybrid = HybridModel('alexnet')
+    hybrid = HybridModel(model_name)
     hybrid.cuda()
     summary(hybrid)
     model, train_loss, val_loss = train.train_hybrid(hybrid, train_his, test_his, 
