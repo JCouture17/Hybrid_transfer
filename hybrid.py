@@ -19,58 +19,59 @@ class Identity(nn.Module):
 class HybridModel(nn.Module):
     def __init__(self, model_name):
         super(HybridModel, self).__init__()
+        self.tl_output = 256
+        
         ### LSTM Network ###
         self.lstm = MyModel(input_shape = 12)
         self.lstm.load_state_dict(torch.load('./result/trained_lstm.pkl'))
         for param in self.lstm.parameters():
             param.requires_grad = False
         self.lstm.fc[9] = Identity()
-        # self.lstm.eval()
         self.lstm.cuda()
         self.flatten = nn.Flatten()
         
         ### Transfer Learning Network ###
         self.transfer_network = transfer_model.load_model(model_name)
-        for param in self.transfer_network.parameters():
-            param.requires_grad = False 
         try:
-            num_features = self.transfer_network.classifier[-1].in_features
-            self.transfer_network.classifier[-1] = nn.Linear(num_features, 256)
+            num_features = self.transfer_network.classifier[1].in_features
+            self.transfer_network.classifier = nn.Linear(num_features, self.tl_output)
             # self.transfer_network.classifier[-1] = Identity()
         except:
-            num_features = self.transfer_network.fc[-1].in_features
-            self.transfer_network.fc[-1] = nn.Linear(num_features, 256)
+            num_features = self.transfer_network.fc[1].in_features
+            self.transfer_network.fc = nn.Linear(num_features, self.tl_output)
             # self.transfer_network.fc[-1] = Identity()
         
         self.transfer_network.cuda()
         
         ### Hybrid Fully-Connected Layers ###
-        self.linear1 = nn.Linear(256+128, 1)
-        # self.linear2 = nn.Linear(512, 256)
-        # self.linear3 = nn.Linear(512, 128)
-        # self.output = nn.Linear(256, 1)
+        self.linear1 = nn.Linear(self.tl_output+12, 512)
+        self.linear2 = nn.Linear(512, 1048)
+        self.linear3 = nn.Linear(1048, 256)
+        self.output = nn.Linear(256, 1)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.1)
+        self.norm = nn.BatchNorm1d(self.tl_output+12)
         
     def forward(self, x, y):
-        x = self.lstm(x)
-        x = self.flatten(x)
+        # x = self.lstm(x)
+        # x = self.flatten(x)
         y = self.transfer_network(y)
         z = torch.cat((x, y), 1)
-        # z = self.dropout(z)
+        z = self.norm(z)
+        z = self.dropout(z)
         z = self.linear1(z)
-        # z = self.relu(z)
-        # z = self.dropout(z)
-        # z = self.linear2(z)
-        # z = self.relu(z)
-        # z = self.linear3(z)
-        # z = self.relu(z)
-        # z = self.output(z)
+        z = self.relu(z)
+        z = self.dropout(z)
+        z = self.linear2(z)
+        z = self.relu(z)
+        z = self.linear3(z)
+        z = self.relu(z)
+        z = self.output(z)
         return z
     
 if __name__ == "__main__":
     ld = functions()
-    epochs = 500
+    epochs = 300
     batch_size = 512
     learning_rate = 0.001
     early_stop = 5
