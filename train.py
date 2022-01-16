@@ -85,7 +85,7 @@ class train:
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
-            print('Time taken for epoch = %ds' % (time() - t1))
+            print('Time taken for epoch = %fs' % (time() - t1))
         # Load best model and evaluate on test set
         model.load_state_dict(best_model_weights)
         test_stats = train.valid_hybrid_step(model, criterion, test_his, test_images)
@@ -94,8 +94,8 @@ class train:
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
-        torch.save(model.state_dict(), save_dir + '/trained_hybrid' + model_name + '.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_hybrid' + model_name + '.pkl\'' % save_dir)
+        torch.save(model.state_dict(), save_dir + '/trained_hybrid_' + model_name + '.pkl') # Use this to save the model to a .pkl file
+        print('Trained model saved to \'%s/trained_hybrid_' + model_name + '.pkl\'' % save_dir)
         return model, train_loss, val_loss
     
     def train_lstm(train_loader, test_loader, lr, epochs, model, early_stop=5, opt='Adam'):
@@ -131,7 +131,7 @@ class train:
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
-            print('Time taken for epoch = %ds' % (time() - t1))
+            print('Time taken for epoch = %fs' % (time() - t1))
         # Load best model and evaluate on test set
         model.load_state_dict(best_model_weights)
         test_stats = train.valid_lstm_step(model, criterion, test_loader)
@@ -179,7 +179,7 @@ class train:
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
-            print('Time taken for epoch = %ds' % (time() - t1))
+            print('Time taken for epoch = %fs' % (time() - t1))
         # Load best model and evaluate on test set
         model.load_state_dict(best_model_weights)
         test_stats = train.valid_step(model, criterion, test_loader)
@@ -188,8 +188,8 @@ class train:
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
-        torch.save(model.state_dict(), save_dir + '/trained_transfer' + model_name +'.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_transfer' + model_name + '.pkl\'' % save_dir)
+        torch.save(model.state_dict(), save_dir + '/trained_transfer_' + model_name +'.pkl') # Use this to save the model to a .pkl file
+        print('Trained model saved to \'%s/trained_transfer_' + model_name + '.pkl\'' % save_dir)
         return model, train_loss, val_loss
         
     def valid_step(model, criterion, val_loader):
@@ -335,7 +335,7 @@ class train:
         test_stats = train.valid_lstm_step(model, criterion, test_loader)
         return test_stats
     
-    def test_hybrid(model, test_loader):
+    def test_hybrid(model, test_his, test_images):
         criterion = nn.MSELoss()
-        test_stats = train.valid_hybrid_step(model, criterion, test_loader)
+        test_stats = train.valid_hybrid_step(model, criterion, test_his, test_images)
         return test_stats

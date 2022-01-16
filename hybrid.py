@@ -72,7 +72,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
     early_stop = 5
     model_name = 'alexnet'
-    transfer = 'y'
+    transfer = 'n'
     
     '''
     Available models:
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     summary(hybrid)
     
     if transfer == 'y':
-        hybrid.load_state_dict(torch.load('./result/trained_hybrid.pkl'))
+        hybrid.load_state_dict(torch.load('./result/trained_hybrid_' + model_name + '.pkl'))
         test_stats = train.test_hybrid(hybrid, test_his, test_images)
             # Print test stats
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],

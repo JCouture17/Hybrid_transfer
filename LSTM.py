@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from torch import nn
 import torch
 from load_data import data
+from torchsummary import summary
 
 class MyModel(nn.Module): 
     def __init__(self, input_shape):
@@ -49,10 +50,11 @@ if __name__ == "__main__":
     batch_size = 256
     learning_rate = 0.001
     early_stop = 5
-    transfer = 'y'
+    transfer = 'n'
     train_loader, test_loader = data.load_datasets(batch_size)
     LSTM = MyModel(input_shape=12)
     LSTM.cuda()
+    summary(LSTM)
     
     if transfer == 'n':
         model, train_loss, val_loss = train.train_lstm(train_loader=train_loader, 

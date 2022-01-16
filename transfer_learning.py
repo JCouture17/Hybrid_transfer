@@ -1,7 +1,7 @@
 from load_data import data
 from train import train
 import matplotlib.pyplot as plt
-from models import load_model
+from models import transfer_model
 import torch
     
 if __name__ == "__main__":
@@ -10,8 +10,8 @@ if __name__ == "__main__":
     batch_size = 512
     lr = 0.001
     early_stop = 5
-    neural_net = 'alexnet'
-    transfer = 'y'
+    neural_net = 'resnet50'
+    transfer = 'n'
     
     '''
     Available models:
@@ -27,10 +27,10 @@ if __name__ == "__main__":
     training, testing = data.load_data(batch_size)
     
     # Train the model on the training data
-    Transfer_network = load_model(neural_net)
+    Transfer_network = transfer_model.load_model(neural_net)
     
     if transfer == 'y':
-        Transfer_network.load_state_dict(torch.load('./result/trained_hybrid' + neural_net + '.pkl'))
+        Transfer_network.load_state_dict(torch.load('./result/trained_transfer_' + neural_net + '.pkl'))
         test_stats = train.test_transfer(Transfer_network, testing)
             # Print test stats
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
