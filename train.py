@@ -52,7 +52,7 @@ class train:
         mape = (torch.sum(torch.div(torch.abs(torch.sub(y_true, y_pred)), torch.abs(y_true))))*100
         return mape
     
-    def train_hybrid(model, train_his, test_his, train_images, test_images, lr, epochs, early_stop=5, opt='Adam'):
+    def train_hybrid(model, model_name, train_his, test_his, train_images, test_images, lr, epochs, early_stop=5, opt='Adam'):
         t0 = time()
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
@@ -94,8 +94,8 @@ class train:
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
-        torch.save(model.state_dict(), save_dir + '/trained_hybrid.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_hybrid.pkl\'' % save_dir)
+        torch.save(model.state_dict(), save_dir + '/trained_hybrid' + model_name + '.pkl') # Use this to save the model to a .pkl file
+        print('Trained model saved to \'%s/trained_hybrid' + model_name + '.pkl\'' % save_dir)
         return model, train_loss, val_loss
     
     def train_lstm(train_loader, test_loader, lr, epochs, model, early_stop=5, opt='Adam'):
@@ -144,9 +144,9 @@ class train:
         print('Trained model saved to \'%s/trained_lstm.pkl\'' % save_dir)
         return model, train_loss, val_loss    
         
-    def train_transfer_network(training, validation, lr, epochs, model_name, early_stop=5, opt='Adam'):
+    def train_transfer_network(model, training, validation, lr, epochs, model_name, early_stop=5, opt='Adam'):
         t0 = time()
-        model = transfer_model.load_model(model_name)
+        model = model
         early_stopping = EarlyStopping(patience=early_stop)
         optimizer = Adam(model.parameters(), lr=lr)
         lr_decay = lr_scheduler.ExponentialLR(optimizer, gamma=0.99)
@@ -187,6 +187,9 @@ class train:
         # print('\nBests Model Accuracies: Train: {:4.2f} | Val: {:4.2f} | Test: {:4.2f}'.format(best_train, best_val, test_stats['accuracy']))
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
+        save_dir = "./result"
+        torch.save(model.state_dict(), save_dir + '/trained_transfer' + model_name +'.pkl') # Use this to save the model to a .pkl file
+        print('Trained model saved to \'%s/trained_transfer' + model_name + '.pkl\'' % save_dir)
         return model, train_loss, val_loss
         
     def valid_step(model, criterion, val_loader):
@@ -322,7 +325,7 @@ class train:
                 'MAE' : mae / len(test_his.dataset), 'RMSE' : rmse}
         
     
-    def test_model(model, test_loader):
+    def test_transfer(model, test_loader):
         criterion = nn.MSELoss()
         test_stats = train.valid_step(model, criterion, test_loader)
         return test_stats

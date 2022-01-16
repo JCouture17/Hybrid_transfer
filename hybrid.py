@@ -72,6 +72,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
     early_stop = 5
     model_name = 'alexnet'
+    transfer = 'y'
     
     '''
     Available models:
@@ -89,17 +90,24 @@ if __name__ == "__main__":
     hybrid = HybridModel(model_name)
     hybrid.cuda()
     summary(hybrid)
-    model, train_loss, val_loss = train.train_hybrid(hybrid, train_his, test_his, 
+    
+    if transfer == 'y':
+        hybrid.load_state_dict(torch.load('./result/trained_hybrid.pkl'))
+        test_stats = train.test_hybrid(hybrid, test_his, test_images)
+            # Print test stats
+        print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
+                                                                test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
+    elif transfer == 'n':
+        model, train_loss, val_loss = train.train_hybrid(hybrid, model_name, train_his, test_his, 
                                                      train_images, test_images, 
                                                      learning_rate, epochs) 
-    
-    # Plot training and validation loss over time
-    plt.plot(train_loss, label='training loss')
-    plt.plot(val_loss, label='validation loss')
-    plt.title('training and validation loss per epochs')
-    plt.xlabel('epochs')
-    plt.ylabel('average loss')
-    plt.legend()
+        # Plot training and validation loss over time
+        plt.plot(train_loss, label='training loss')
+        plt.plot(val_loss, label='validation loss')
+        plt.title('training and validation loss per epochs')
+        plt.xlabel('epochs')
+        plt.ylabel('average loss')
+        plt.legend()
 
     
     
