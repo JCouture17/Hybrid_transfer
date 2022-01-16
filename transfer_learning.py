@@ -3,6 +3,7 @@ from train import train
 import matplotlib.pyplot as plt
 from models import transfer_model
 import torch
+from torchsummary import summary
     
 if __name__ == "__main__":
     # User inputs
@@ -10,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 512
     lr = 0.001
     early_stop = 5
-    neural_net = 'resnet50'
+    neural_net = 'resnet152'
     transfer = 'n'
     
     '''
@@ -20,7 +21,10 @@ if __name__ == "__main__":
         - resnet152;
         - vgg11;
         - googlenet;
-        - alexnet
+        - alexnet;
+        - efficientnet;
+        - densenet;
+        - regnet
     '''
      
     # Load the data
@@ -28,6 +32,7 @@ if __name__ == "__main__":
     
     # Train the model on the training data
     Transfer_network = transfer_model.load_model(neural_net)
+    summary(Transfer_network,(3,224,224))
     
     if transfer == 'y':
         Transfer_network.load_state_dict(torch.load('./result/trained_transfer_' + neural_net + '.pkl'))

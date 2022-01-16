@@ -21,14 +21,6 @@ class HybridModel(nn.Module):
         super(HybridModel, self).__init__()
         self.tl_output = 256
         
-        ### LSTM Network ###
-        self.lstm = MyModel(input_shape = 12)
-        self.lstm.load_state_dict(torch.load('./result/trained_lstm.pkl'))
-        for param in self.lstm.parameters():
-            param.requires_grad = False
-        self.lstm.fc[9] = Identity()
-        self.lstm.cuda()
-        
         ### Transfer Learning Network ###
         self.transfer_network = transfer_model.load_model(model_name)
         try:
@@ -50,7 +42,6 @@ class HybridModel(nn.Module):
         self.norm = nn.BatchNorm1d(self.tl_output+12)
         
     def forward(self, x, y):
-        # x = self.lstm(x)
         y = self.transfer_network(y)
         z = torch.cat((x, y), 1)
         z = self.norm(z)
@@ -71,7 +62,7 @@ if __name__ == "__main__":
     batch_size = 512
     learning_rate = 0.001
     early_stop = 5
-    model_name = 'alexnet'
+    model_name = 'resnet18'
     transfer = 'n'
     
     '''
