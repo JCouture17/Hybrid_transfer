@@ -28,18 +28,15 @@ class HybridModel(nn.Module):
             param.requires_grad = False
         self.lstm.fc[9] = Identity()
         self.lstm.cuda()
-        self.flatten = nn.Flatten()
         
         ### Transfer Learning Network ###
         self.transfer_network = transfer_model.load_model(model_name)
         try:
             num_features = self.transfer_network.classifier[1].in_features
             self.transfer_network.classifier = nn.Linear(num_features, self.tl_output)
-            # self.transfer_network.classifier[-1] = Identity()
         except:
             num_features = self.transfer_network.fc[1].in_features
             self.transfer_network.fc = nn.Linear(num_features, self.tl_output)
-            # self.transfer_network.fc[-1] = Identity()
         
         self.transfer_network.cuda()
         
@@ -54,7 +51,6 @@ class HybridModel(nn.Module):
         
     def forward(self, x, y):
         # x = self.lstm(x)
-        # x = self.flatten(x)
         y = self.transfer_network(y)
         z = torch.cat((x, y), 1)
         z = self.norm(z)
@@ -71,7 +67,7 @@ class HybridModel(nn.Module):
     
 if __name__ == "__main__":
     ld = functions()
-    epochs = 300
+    epochs = 500
     batch_size = 512
     learning_rate = 0.001
     early_stop = 5

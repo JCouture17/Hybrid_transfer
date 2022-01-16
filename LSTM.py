@@ -49,7 +49,7 @@ if __name__ == "__main__":
     batch_size = 256
     learning_rate = 0.001
     early_stop = 5
-    transfer = 'n'
+    transfer = 'y'
     train_loader, test_loader = data.load_datasets(batch_size)
     LSTM = MyModel(input_shape=12)
     LSTM.cuda()
