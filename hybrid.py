@@ -6,7 +6,6 @@ import torch.nn as nn
 from train import train
 from misc_functions import functions
 from models import transfer_model
-from LSTM import MyModel
 from load_data import data
 
 class Identity(nn.Module):
@@ -62,7 +61,7 @@ if __name__ == "__main__":
     batch_size = 512
     learning_rate = 0.001
     early_stop = 5
-    model_name = 'resnet18'
+    model_name = 'resnet50'
     transfer = 'n'
     
     '''
@@ -72,7 +71,10 @@ if __name__ == "__main__":
         - resnet152;
         - vgg11;
         - googlenet;
-        - alexnet
+        - alexnet;
+        - efficientnet;
+        - densenet;
+        - regnet
     '''
     
     ## Loading the data

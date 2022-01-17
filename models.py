@@ -38,22 +38,35 @@ class transfer_model:
             
         try:
             num_features = model.classifier[1].in_features
-            model.classifier = nn.Sequential(
-                nn.Dropout(0.2),
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Linear(512, 256),
-                nn.ReLU(),
-                nn.Linear(256, 1))
         except:
+            pass
+        
+        try:
             num_features = model.fc.in_features
+        except:
+            pass
+        
+        try:
+            num_features = model.classifier.in_features
+        except:
+            pass
+            
+        try:
             model.fc = nn.Sequential(
-                nn.Dropout(0.2),
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Linear(512, 256),
-                nn.ReLU(),
-                nn.Linear(256, 1))
+                    nn.Dropout(0.2),
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Linear(256, 1))
+        except:
+            model.classifier = nn.Sequential(
+                    nn.Dropout(0.2),
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Linear(256, 1))
         
         if torch.cuda.is_available:
             model.cuda()
