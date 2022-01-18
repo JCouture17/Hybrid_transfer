@@ -26,8 +26,12 @@ class HybridModel(nn.Module):
             num_features = self.transfer_network.classifier[1].in_features
             self.transfer_network.classifier = nn.Linear(num_features, self.tl_output)
         except:
+            pass
+        try:
             num_features = self.transfer_network.fc[1].in_features
             self.transfer_network.fc = nn.Linear(num_features, self.tl_output)
+        except:
+            pass
         
         self.transfer_network.cuda()
         
@@ -61,7 +65,7 @@ if __name__ == "__main__":
     batch_size = 512
     learning_rate = 0.001
     early_stop = 5
-    model_name = 'resnet50'
+    model_name = 'googlenet'
     transfer = 'n'
     
     '''

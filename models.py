@@ -2,6 +2,7 @@
 import torch.nn as nn
 from torchvision import models
 import torch
+from torchsummary import summary
 
 class transfer_model:
     
@@ -36,22 +37,26 @@ class transfer_model:
         for param in model.parameters():
             param.requires_grad=False
             
+        # summary(model, (3,224,224))
+            
         try:
             num_features = model.classifier[1].in_features
+            model.classifier = nn.Sequential(
+                    nn.Dropout(0.2),
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Linear(256, 1))
+        # except:
+        #     num_features = model.classifier.in_features
+        #     # print("didn't get to first")
         except:
+            # num_features = model.classifier[0].in_features
             pass
         
         try:
             num_features = model.fc.in_features
-        except:
-            pass
-        
-        try:
-            num_features = model.classifier.in_features
-        except:
-            pass
-            
-        try:
             model.fc = nn.Sequential(
                     nn.Dropout(0.2),
                     nn.Linear(num_features, 512),
@@ -60,13 +65,12 @@ class transfer_model:
                     nn.ReLU(),
                     nn.Linear(256, 1))
         except:
-            model.classifier = nn.Sequential(
-                    nn.Dropout(0.2),
-                    nn.Linear(num_features, 512),
-                    nn.ReLU(),
-                    nn.Linear(512, 256),
-                    nn.ReLU(),
-                    nn.Linear(256, 1))
+            pass
+
+            
+            
+            
+            # summary(model, (3,224,244))
         
         if torch.cuda.is_available:
             model.cuda()

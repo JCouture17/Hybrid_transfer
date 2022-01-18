@@ -100,11 +100,6 @@ class data:
         testing_targets = fcts.load('./Data/testing_targets.mat', 'testing_targets').astype(np.int16)
         testing_data = torch.tensor(np.delete(testing_data, 0, 1))
         
-        # training_data = training_data.reshape([training_data.shape[0], 1, training_data.shape[1]])
-        # testing_data = testing_data.reshape([testing_data.shape[0], 1, testing_data.shape[1]])
-        # training_targets = training_targets.reshape([training_targets.shape[0], 1])
-        # testing_targets = testing_targets.reshape([testing_targets.shape[0], 1])
-        
         train_loader = CustomDataset(dataset=(training_data, training_targets))
         test_loader = CustomDataset(dataset=(testing_data, testing_targets))
         train_loader = DataLoader(train_loader, sampler=RandomSampler(train_loader), batch_size=batch_size)
