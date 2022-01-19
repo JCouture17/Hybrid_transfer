@@ -11,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 512
     lr = 0.001
     early_stop = 5
-    neural_net = 'vgg11'
+    neural_net = 'densenet'
     transfer = 'n'
     
     '''

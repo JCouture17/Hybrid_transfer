@@ -51,11 +51,7 @@ class transfer_model:
         # except:
         #     num_features = model.classifier.in_features
         #     # print("didn't get to first")
-        except:
-            # num_features = model.classifier[0].in_features
-            pass
-        
-        try:
+        except AttributeError:
             num_features = model.fc.in_features
             model.fc = nn.Sequential(
                     nn.Dropout(0.2),
@@ -64,10 +60,24 @@ class transfer_model:
                     nn.Linear(512, 256),
                     nn.ReLU(),
                     nn.Linear(256, 1))
+        except TypeError:
+            num_features = model.classifier.in_features
+            model.classifier = nn.Sequential(
+                    nn.Dropout(0.2),
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Linear(256, 1))   
         except:
-            pass
-
-            
+            num_features = model.classifier[0].in_features
+            model.classifier = nn.Sequential(
+                    nn.Dropout(0.2),
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Linear(256, 1))       
             
             
             # summary(model, (3,224,244))
