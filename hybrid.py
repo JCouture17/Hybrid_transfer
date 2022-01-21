@@ -65,7 +65,7 @@ if __name__ == "__main__":
     batch_size = 512
     learning_rate = 0.001
     early_stop = 5
-    model_name = 'resnet50'
+    model_name = 'densenet'
     transfer = 'n'
     
     '''
