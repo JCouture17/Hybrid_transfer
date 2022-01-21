@@ -2,7 +2,6 @@
 import torch.nn as nn
 from torchvision import models
 import torch
-from torchsummary import summary
 
 class transfer_model:
     
@@ -30,9 +29,6 @@ class transfer_model:
             
         elif model_name == 'densenet':
             model = models.densenet161(pretrained=True)
-            
-        elif model_name == 'regnet':
-            model = models.regnet_y_32gf(pretrained=True)
             
         for param in model.parameters():
             param.requires_grad=False

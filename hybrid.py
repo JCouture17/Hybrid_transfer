@@ -78,7 +78,6 @@ if __name__ == "__main__":
         - alexnet;
         - efficientnet;
         - densenet;
-        - regnet
     '''
     
     ## Loading the data

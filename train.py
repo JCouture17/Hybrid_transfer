@@ -1,11 +1,13 @@
 ### Train model ###
-from models import transfer_model
 import numpy as np
 import torch.nn as nn
 import torch
 import copy
 from time import time
 from torch.optim import Adam, lr_scheduler
+# from torch.utils.tensorboard import SummaryWriter
+
+# writer = SummaryWriter()
 
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
@@ -90,7 +92,6 @@ class train:
         model.load_state_dict(best_model_weights)
         test_stats = train.valid_hybrid_step(model, criterion, test_his, test_images)
         print("Total time = %ds" % (time() - t0))
-        # print('\nBests Model Accuracies: Train: {:4.2f} | Val: {:4.2f} | Test: {:4.2f}'.format(best_train, best_val, test_stats['accuracy']))
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
@@ -136,7 +137,6 @@ class train:
         model.load_state_dict(best_model_weights)
         test_stats = train.valid_lstm_step(model, criterion, test_loader)
         print("Total time = %ds" % (time() - t0))
-        # print('\nBests Model Accuracies: Train: {:4.2f} | Val: {:4.2f} | Test: {:4.2f}'.format(best_train, best_val, test_stats['accuracy']))
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
@@ -160,7 +160,7 @@ class train:
             t1 = time()
             # Train and Validate
             print('epoch:', epoch)
-            train_stats = train.train_step(model, criterion, optimizer, train_loader)
+            train_stats = train.train_step(model, criterion, optimizer, train_loader, epoch)
             valid_stats = train.valid_step(model, criterion, test_loader)
             train_loss.append(train_stats['loss'])
             val_loss.append(valid_stats['loss'])
@@ -184,7 +184,6 @@ class train:
         model.load_state_dict(best_model_weights)
         test_stats = train.valid_step(model, criterion, test_loader)
         print("Total time = %ds" % (time() - t0))
-        # print('\nBests Model Accuracies: Train: {:4.2f} | Val: {:4.2f} | Test: {:4.2f}'.format(best_train, best_val, test_stats['accuracy']))
         print('\nBest Validation Results: Average Loss: {:4.2f} | Accuracy: {:4.2f} | MAE: {:4.2f} | RMSE: {:4.2f}'.format(test_stats['loss'],
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
@@ -217,7 +216,7 @@ class train:
         return {'loss' : avg_loss / len(val_loader.dataset), 'accuracy' : 100-(absolute_percentage_error / len(val_loader.dataset)),
                 'MAE' : mae / len(val_loader.dataset), 'RMSE' : rmse}
     
-    def train_step(model, criterion, optimizer, train_loader):
+    def train_step(model, criterion, optimizer, train_loader, epoch):
         model.train()
         avg_loss = 0.0
         absolute_percentage_error = 0.0
@@ -232,6 +231,7 @@ class train:
             # gather statistics
             avg_loss += loss.item()
             absolute_percentage_error += train.mape(labels, pred)
+        # writer.add_scalar("Loss/train", avg_loss / len(train_loader.dataset), epoch)
         return {'loss': avg_loss / len(train_loader.dataset), 'accuracy': 100-(absolute_percentage_error / len(train_loader.dataset))}
     
     def train_lstm_step(model, criterion, optimizer, train_loader):
