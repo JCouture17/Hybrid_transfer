@@ -62,11 +62,11 @@ class HybridModel(nn.Module):
 if __name__ == "__main__":
     ld = functions()
     epochs = 500
-    batch_size = 512
+    batch_size = 256
     learning_rate = 0.001
     early_stop = 5
-    model_name = 'densenet'
-    transfer = 'n'
+    model_name = 'alexnet'
+    transfer = 'full-train'
     
     '''
     Available models:
@@ -97,6 +97,14 @@ if __name__ == "__main__":
         model, train_loss, val_loss = train.train_hybrid(hybrid, model_name, train_his, test_his, 
                                                      train_images, test_images, 
                                                      learning_rate, epochs) 
+        
+    elif transfer == 'full-train':
+        for param in hybrid.parameters():
+            param.requires_grad=True
+        model, train_loss, val_loss = train.train_hybrid(hybrid, model_name, train_his, test_his,
+                                                         train_images, test_images,
+                                                         learning_rate, epochs)
+        
         # Plot training and validation loss over time
         plt.plot(train_loss, label='training loss')
         plt.plot(val_loss, label='validation loss')

@@ -7,7 +7,7 @@ from torchsummary import summary
     
 if __name__ == "__main__":
     # User inputs
-    epochs = 10
+    epochs = 150
     batch_size = 512
     lr = 0.001
     early_stop = 5
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         model, train_loss, val_loss = train.train_transfer_network(Transfer_network,
                         training, testing, lr=lr, epochs=epochs, model_name = neural_net, 
                         early_stop=early_stop)
-        
+
         # Plot training and validation loss over time
         plt.plot(train_loss, label='training loss')
         plt.plot(val_loss, label='validation loss')
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         ax[1].imshow(saliency.cpu(), cmap='hot')
         ax[1].axis('off')
         plt.tight_layout()
-        fig.suptitle('The Image and Its Saliency Map')
+        fig.suptitle('The Image and Its Saliency Map Before Training')
         plt.show()
         
         # Saliency Map after training
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         ax[1].imshow(saliency.cpu(), cmap='hot')
         ax[1].axis('off')
         plt.tight_layout()
-        fig.suptitle('The Image and Its Saliency Map')
+        fig.suptitle('The Image and Its Saliency Map After Training')
         plt.show()
         
         

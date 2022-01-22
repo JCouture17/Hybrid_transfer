@@ -96,7 +96,7 @@ class train:
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
         torch.save(model.state_dict(), save_dir + '/trained_hybrid_' + model_name + '.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_hybrid_' + model_name + '.pkl\'' % save_dir)
+        # print('Trained model saved to \'%s/trained_hybrid_' + model_name + '.pkl\'' % save_dir)
         return model, train_loss, val_loss
     
     def train_lstm(train_loader, test_loader, lr, epochs, model, early_stop=5, opt='Adam'):
@@ -141,7 +141,7 @@ class train:
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
         torch.save(model.state_dict(), save_dir + '/trained_lstm.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_lstm.pkl\'' % save_dir)
+        # print('Trained model saved to \'%s/trained_lstm.pkl\'' % save_dir)
         return model, train_loss, val_loss    
         
     def train_transfer_network(model, training, validation, lr, epochs, model_name, early_stop=5, opt='Adam'):
@@ -188,7 +188,7 @@ class train:
                                                                     test_stats['accuracy'], test_stats['MAE'], test_stats['RMSE']))
         save_dir = "./result"
         torch.save(model.state_dict(), save_dir + '/trained_transfer_' + model_name +'.pkl') # Use this to save the model to a .pkl file
-        print('Trained model saved to \'%s/trained_transfer_' + model_name + '.pkl\'' % save_dir)
+        # print('Trained model saved to \'%s/trained_transfer_' + model_name + '.pkl\'' % save_dir)
         return model, train_loss, val_loss
         
     def valid_step(model, criterion, val_loader):
