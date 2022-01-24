@@ -7,12 +7,12 @@ from torchsummary import summary
     
 if __name__ == "__main__":
     # User inputs
-    epochs = 150
+    epochs = 300
     batch_size = 512
     lr = 0.001
     early_stop = 5
-    neural_net = 'alexnet'
-    transfer = 'n'
+    neural_net = 'resnet50'
+    transfer = 'y'
     
     '''
     Available models:
