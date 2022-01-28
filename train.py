@@ -191,27 +191,29 @@ class train:
         
     def valid_step(model, criterion, val_loader):
         model.eval()
-        avg_loss = 0.0
-        absolute_percentage_error = 0.0
-        mse, mae, se = 0.0, 0.0, 0.0
-        for i, (x_imgs, labels) in enumerate(val_loader):
-            x_imgs, labels = x_imgs.cuda(), labels.cuda()
-            # forward pass
-            output = model(x_imgs)
-            loss = criterion(output, labels)
-            # gather statistics
-            avg_loss += loss.item()        
-            mae += torch.sum((abs(output - labels)))
-            # print('outputs ', output)
-            # print('labels ', labels)
-            # print('mae ', torch.sum((abs(output - labels))))
-            se += torch.sum((abs(output - labels))**2)
-            # print('se ', torch.sum((abs(output - labels))**2))
-            absolute_percentage_error += train.mape(labels, output)
-            # print('ape ', train.mape(labels, output))
-            # print('mse loss ', loss.item())
-            mse += nn.MSELoss(output, labels, reduction='sum')
-        rmse = (mse / len(val_loader.dataset))**0.5
+        with torch.no_grad():
+            avg_loss = 0.0
+            absolute_percentage_error = 0.0
+            mse, mae, se = 0.0, 0.0, 0.0
+            mseLoss = nn.MSELoss(reduction='sum')
+            for i, (x_imgs, labels) in enumerate(val_loader):
+                x_imgs, labels = x_imgs.cuda(), labels.cuda()
+                # forward pass
+                output = model(x_imgs)
+                loss = criterion(output, labels)
+                # gather statistics
+                avg_loss += loss.item()        
+                mae += torch.sum((abs(output - labels)))
+                # print('outputs ', output)
+                # print('labels ', labels)
+                # print('mae ', torch.sum((abs(output - labels))))
+                se += torch.sum((abs(output - labels))**2)
+                # print('se ', torch.sum((abs(output - labels))**2))
+                absolute_percentage_error += train.mape(labels, output)
+                # print('ape ', train.mape(labels, output))
+                # print('mse loss ', loss.item())
+                mse += mseLoss(output, labels)
+            rmse = (mse / len(val_loader.dataset))**0.5
         return {'loss' : avg_loss / len(val_loader.dataset), 'accuracy' : 100-(absolute_percentage_error / len(val_loader.dataset)),
                 'MAE' : mae / len(val_loader.dataset), 'RMSE' : rmse}
     
@@ -256,21 +258,22 @@ class train:
     
     def valid_lstm_step(model, criterion, val_loader):
         model.eval()
-        avg_loss = 0.0
-        absolute_percentage_error = 0.0
-        mae, se = 0.0, 0.0
-        for i, (x_his, labels) in enumerate(val_loader):
-            x_his, labels = x_his.float().cuda(), labels.cuda()
-            # forward pass
-            output = model(x_his)
-            # output = torch.squeeze(output, 2)
-            loss = criterion(output, labels)
-            # gather statistics
-            avg_loss += loss.item()        
-            mae += torch.sum((abs(torch.sub(output, labels))))
-            se += torch.sum((abs(output - labels))**2)
-            absolute_percentage_error += train.mape(labels, output)
-        rmse = ((se/(len(val_loader.dataset)))**0.5)
+        with torch.no_grad():
+            avg_loss = 0.0
+            absolute_percentage_error = 0.0
+            mae, se = 0.0, 0.0
+            for i, (x_his, labels) in enumerate(val_loader):
+                x_his, labels = x_his.float().cuda(), labels.cuda()
+                # forward pass
+                output = model(x_his)
+                # output = torch.squeeze(output, 2)
+                loss = criterion(output, labels)
+                # gather statistics
+                avg_loss += loss.item()        
+                mae += torch.sum((abs(torch.sub(output, labels))))
+                se += torch.sum((abs(output - labels))**2)
+                absolute_percentage_error += train.mape(labels, output)
+            rmse = ((se/(len(val_loader.dataset)))**0.5)
         # print('Validation accuracy: ', 100-(absolute_percentage_error / len(val_loader.dataset)))
         return {'loss' : avg_loss / len(val_loader.dataset), 'accuracy' : 100-(absolute_percentage_error / len(val_loader.dataset)),
                 'MAE' : mae / len(val_loader.dataset), 'RMSE' : rmse}
@@ -301,25 +304,26 @@ class train:
         
     def valid_hybrid_step(model, criterion, test_his, test_images):
         model.eval()
-        avg_loss = 0.0
-        absolute_percentage_error = 0.0
-        mae, se = 0.0, 0.0
-        dataloader_iter = iter(test_images)
-        for i, (x_his, labels) in enumerate(test_his):
-            try:
-                (x_images, labels) = next(dataloader_iter)
-            except StopIteration:
-                print("Something doesn't work")
-            x_his, x_images, labels = x_his.float().cuda(), x_images.cuda(), labels.cuda()
-            # forward pass
-            output = model(x_his, x_images)
-            loss = criterion(output, labels)
-            # gather statistics
-            avg_loss += loss.item()        
-            mae += torch.sum((abs(torch.sub(output, labels))))
-            se += torch.sum((abs(output - labels))**2)
-            absolute_percentage_error += train.mape(labels, output)
-        rmse = ((se/(len(test_his.dataset)))**0.5)
+        with torch.no_grad():
+            avg_loss = 0.0
+            absolute_percentage_error = 0.0
+            mae, se = 0.0, 0.0
+            dataloader_iter = iter(test_images)
+            for i, (x_his, labels) in enumerate(test_his):
+                try:
+                    (x_images, labels) = next(dataloader_iter)
+                except StopIteration:
+                    print("Something doesn't work")
+                x_his, x_images, labels = x_his.float().cuda(), x_images.cuda(), labels.cuda()
+                # forward pass
+                output = model(x_his, x_images)
+                loss = criterion(output, labels)
+                # gather statistics
+                avg_loss += loss.item()        
+                mae += torch.sum((abs(torch.sub(output, labels))))
+                se += torch.sum((abs(output - labels))**2)
+                absolute_percentage_error += train.mape(labels, output)
+            rmse = ((se/(len(test_his.dataset)))**0.5)
         return {'loss' : avg_loss / len(test_his.dataset), 'accuracy' : 100-(absolute_percentage_error / len(test_his.dataset)),
                 'MAE' : mae / len(test_his.dataset), 'RMSE' : rmse}
         

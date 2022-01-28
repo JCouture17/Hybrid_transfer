@@ -65,8 +65,9 @@ if __name__ == "__main__":
     batch_size = 256
     learning_rate = 0.001
     early_stop = 5
+    cycle = 5
     model_name = 'alexnet'
-    transfer = 'full-train'
+    transfer = 'y'
     
     '''
     Available models:
@@ -81,8 +82,8 @@ if __name__ == "__main__":
     '''
     
     ## Loading the data
-    train_images, test_images = data.load_data(batch_size)
-    train_his, test_his = data.load_datasets(batch_size)
+    train_images, test_images = data.load_images(batch_size, cycle)
+    train_his, test_his = data.load_his(batch_size, cycle)
     hybrid = HybridModel(model_name)
     hybrid.cuda()
     summary(hybrid)

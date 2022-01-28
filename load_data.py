@@ -67,7 +67,7 @@ class RandomSampler(Sampler[int]):
     
 
 class data:
-    def load_images(train_dataset, train_targets, test_dataset, test_targets, batch_size):
+    def load_data(train_dataset, train_targets, test_dataset, test_targets, batch_size):
         transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -81,23 +81,36 @@ class data:
         test_loader = DataLoader(test_data, sampler=RandomSampler(test_data), batch_size=batch_size)
         return train_loader, test_loader
     
-    def load_data(batch_size):
+    def load_images(batch_size, cycle):
         from skimage import io
         ld = functions()
-        train_data = io.imread('./Data/training_data.tif')
-        test_data = io.imread('./Data/testing_dataset.tif')
-        train_rul = ld.load('./Data/training_targets.mat', 'training_targets').astype(np.int16)
-        test_rul = ld.load('./Data/testing_targets.mat', 'testing_targets').astype(np.int16)
-        train_loader, test_loader = data.load_images(train_data, train_rul, test_data, test_rul, batch_size)
+        train_data = io.imread('./Data/' + str(cycle) + 'cycle/training_data.tif')
+        test_data = io.imread('./Data/' + str(cycle) + 'cycle/testing_dataset.tif')
+        training_data = ld.load('./Data/' + str(cycle) + 'cycle/training_his.mat', 'training_his').astype(np.int16)
+        testing_data = ld.load('./Data/' + str(cycle) + 'cycle/testing_his.mat', 'testing_his').astype(np.int16)
+        
+        if cycle == 1:
+            train_data = np.delete(train_data, 0, 0)
+        
+        train_targets = training_data[:,0]
+        train_targets = np.reshape(train_targets, (train_targets.size, 1))
+        test_targets = testing_data[:,0]
+        test_targets = np.reshape(test_targets, (test_targets.size, 1))
+        
+        train_loader, test_loader = data.load_data(train_data, train_targets, test_data, test_targets, batch_size)
         return train_loader, test_loader
     
-    def load_datasets(batch_size):
+    def load_his(batch_size, cycle):
         fcts = functions() 
-        training_data = fcts.load('./Data/training_his.mat', 'training_his').astype(np.float16)
-        testing_data = fcts.load('./Data/testing_his.mat', 'testing_his').astype(np.float16)
-        training_targets = fcts.load('./Data/training_targets.mat', 'training_targets').astype(np.int16)
+        training_data = fcts.load('./Data/' + str(cycle) + 'cycle/training_his.mat', 'training_his').astype(np.float16)
+        testing_data = fcts.load('./Data/' + str(cycle) + 'cycle/testing_his.mat', 'testing_his').astype(np.float16)
+        # training_targets = fcts.load('./Data/' + str(cycle) + 'cycle/training_targets.mat', 'training_targets').astype(np.int16)
+        training_targets = training_data[:,0]
+        training_targets = np.reshape(training_targets, (training_targets.size, 1))
         training_data = torch.tensor(np.delete(training_data, 0, 1))
-        testing_targets = fcts.load('./Data/testing_targets.mat', 'testing_targets').astype(np.int16)
+        # testing_targets = fcts.load('./Data/' + str(cycle) + 'cycle/testing_targets.mat', 'testing_targets').astype(np.int16)
+        testing_targets = testing_data[:,0]
+        testing_targets = np.reshape(testing_targets, (testing_targets.size, 1))
         testing_data = torch.tensor(np.delete(testing_data, 0, 1))
         
         train_loader = CustomDataset(dataset=(training_data, training_targets))

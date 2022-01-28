@@ -12,35 +12,35 @@ t5 = loadtiff(append(path, 'train_data5.tif'));
 t6 = loadtiff(append(path, 'train_data6.tif'));
 t7 = loadtiff(append(path, 'train_data7.tif'));
 t8 = loadtiff(append(path, 'train_data8.tif'));
-r1 = load(append(path, 'train_rul1.mat')).rul;
-r2 = load(append(path, 'train_rul2.mat')).rul;
-r3 = load(append(path, 'train_rul3.mat')).rul;
-r4 = load(append(path, 'train_rul4.mat')).rul;
-r5 = load(append(path, 'train_rul5.mat')).rul;
-r6 = load(append(path, 'train_rul6.mat')).rul;
-r7 = load(append(path, 'train_rul7.mat')).rul;
-r8 = load(append(path, 'train_rul8.mat')).rul;
+% r1 = load(append(path, 'train_rul1.mat')).rul;
+% r2 = load(append(path, 'train_rul2.mat')).rul;
+% r3 = load(append(path, 'train_rul3.mat')).rul;
+% r4 = load(append(path, 'train_rul4.mat')).rul;
+% r5 = load(append(path, 'train_rul5.mat')).rul;
+% r6 = load(append(path, 'train_rul6.mat')).rul;
+% r7 = load(append(path, 'train_rul7.mat')).rul;
+% r8 = load(append(path, 'train_rul8.mat')).rul;
 
 training_dataset = cat(4, t1, t2, t3, t4, t5, t6, t7, t8);
-training_targets = cat(1, r1, r2, r3, r4, r5, r6, r7, r8);
+% training_targets = cat(1, r1, r2, r3, r4, r5, r6, r7, r8);
 
 options.append = true;
 options.color = true;
 options.compress = 'lzw';
 saveastiff(training_dataset, 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\training_data.tif', options);
-save(append(path, 'training_targets.mat'), 'training_targets');
+% save(append(path, 'training_targets.mat'), 'training_targets');
 
 %% Testing images
 t1 = loadtiff(append(path, 'test_data1.tif'));
 t2 = loadtiff(append(path, 'test_data2.tif'));
-r1 = load(append(path, 'test_rul1.mat')).rul;
-r2 = load(append(path, 'test_rul2.mat')).rul;
+% r1 = load(append(path, 'test_rul1.mat')).rul;
+% r2 = load(append(path, 'test_rul2.mat')).rul;
 
 testing_dataset = cat(4, t1, t2);
-testing_targets = cat(1, r1, r2);
+% testing_targets = cat(1, r1, r2);
 
 saveastiff(testing_dataset, append(path, 'testing_dataset.tif'), options);
-save(append(path, 'testing_targets.mat'), 'testing_targets');
+% save(append(path, 'testing_targets.mat'), 'testing_targets');
 
 
 %% Training and Testing Health Indicators

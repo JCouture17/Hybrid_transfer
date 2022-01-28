@@ -11,8 +11,9 @@ if __name__ == "__main__":
     batch_size = 512
     lr = 0.001
     early_stop = 5
-    neural_net = 'resnet50'
-    transfer = 'y'
+    cycle = 1
+    neural_net = 'alexnet'
+    transfer = 'n'
     
     '''
     Available models:
@@ -25,9 +26,9 @@ if __name__ == "__main__":
         - efficientnet;
         - densenet;
     '''
-     
+    
     # Load the data
-    training, testing = data.load_data(batch_size)
+    training, testing = data.load_images(batch_size, cycle)
     
     # Train the model on the training data
     Transfer_network = transfer_model.load_model(neural_net)

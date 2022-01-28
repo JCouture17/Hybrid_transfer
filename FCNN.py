@@ -33,8 +33,12 @@ if __name__ == "__main__":
     learning_rate = 0.001
     early_stop = 5
     transfer = 'n'
-    train_loader, test_loader = data.load_datasets(batch_size)
-    FCNN = MyModel(input_shape=12)
+    cycle = 5
+    train_loader, test_loader = data.load_his(batch_size, cycle)
+    if cycle == 1:
+        FCNN = MyModel(input_shape=10)
+    else:
+        FCNN = MyModel(input_shape=12)
     FCNN.cuda()
     summary(FCNN)
     
