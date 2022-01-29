@@ -33,7 +33,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
     early_stop = 5
     transfer = 'n'
-    cycle = 5
+    cycle = 10
     train_loader, test_loader = data.load_his(batch_size, cycle)
     if cycle == 1:
         FCNN = MyModel(input_shape=10)

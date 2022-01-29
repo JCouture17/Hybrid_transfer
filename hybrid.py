@@ -61,13 +61,13 @@ class HybridModel(nn.Module):
     
 if __name__ == "__main__":
     ld = functions()
-    epochs = 500
+    epochs = 300
     batch_size = 256
     learning_rate = 0.001
     early_stop = 5
-    cycle = 5
+    cycle = 10
     model_name = 'alexnet'
-    transfer = 'y'
+    transfer = 'n'
     
     '''
     Available models:
