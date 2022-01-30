@@ -8,11 +8,11 @@ from torchsummary import summary
 if __name__ == "__main__":
     # User inputs
     epochs = 200
-    batch_size = 150
+    batch_size = 256
     lr = 0.001
     early_stop = 5
     cycle = 1
-    neural_net = 'resnet50'
+    neural_net = 'densenet'
     transfer = 'n'
     
     '''

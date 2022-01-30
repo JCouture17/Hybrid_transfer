@@ -16,7 +16,7 @@ class Identity(nn.Module):
         return(x)
     
 class HybridModel(nn.Module):
-    def __init__(self, model_name):
+    def __init__(self, model_name, cycle):
         super(HybridModel, self).__init__()
         self.tl_output = 256
         
@@ -26,23 +26,23 @@ class HybridModel(nn.Module):
             num_features = self.transfer_network.classifier[1].in_features
             self.transfer_network.classifier = nn.Linear(num_features, self.tl_output)
         except:
-            pass
-        try:
             num_features = self.transfer_network.fc[1].in_features
             self.transfer_network.fc = nn.Linear(num_features, self.tl_output)
-        except:
-            pass
-        
         self.transfer_network.cuda()
         
         ### Hybrid Fully-Connected Layers ###
-        self.linear1 = nn.Linear(self.tl_output+12, 512)
+        if cycle == 1:
+            self.linear1 = nn.Linear(self.tl_output+10, 512)
+            self.norm = nn.BatchNorm1d(self.tl_output+10)
+        else:
+            self.linear1 = nn.Linear(self.tl_output+12, 512)
+            self.norm = nn.BatchNorm1d(self.tl_output+12)
         self.linear2 = nn.Linear(512, 1048)
         self.linear3 = nn.Linear(1048, 256)
         self.output = nn.Linear(256, 1)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.1)
-        self.norm = nn.BatchNorm1d(self.tl_output+12)
+        
         
     def forward(self, x, y):
         y = self.transfer_network(y)
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     batch_size = 256
     learning_rate = 0.001
     early_stop = 5
-    cycle = 10
+    cycle = 1
     model_name = 'alexnet'
     transfer = 'n'
     
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     ## Loading the data
     train_images, test_images = data.load_images(batch_size, cycle)
     train_his, test_his = data.load_his(batch_size, cycle)
-    hybrid = HybridModel(model_name)
+    hybrid = HybridModel(model_name, cycle)
     hybrid.cuda()
     summary(hybrid)
     
