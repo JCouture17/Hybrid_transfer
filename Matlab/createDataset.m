@@ -66,7 +66,7 @@ data(1:5:end,:) = [];
 %% Image as Inputs
 folder = 'C:\Users\JCout\Documents\GitHub\Hybrid_transfer\Data\';
 cycle_count = 10;
-layout = 'm'; % 's' for 'single', 'm' for 'multi'
+layout = 't'; % 's' for 'single', 'm' for 'multi', 't' for test
 
 make_image(data(1:10,:), cycle_count, layout, append(folder, 'train_data1.tif'), append(folder, 'train_rul1.mat'),...
     append(folder, 'train_hi1.mat'));

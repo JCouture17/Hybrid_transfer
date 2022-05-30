@@ -12,7 +12,7 @@ if __name__ == "__main__":
     lr = 0.001
     early_stop = 5
     cycle = 1
-    neural_net = 'densenet'
+    neural_net = 'efficientnet'
     transfer = 'n'
     
     '''
@@ -52,53 +52,5 @@ if __name__ == "__main__":
         plt.xlabel('epochs')
         plt.ylabel('average loss')
         plt.legend()
-        
-        
-        # # Saliency Map before training
-        # batch_size=1
-        # training, testing = data.load_data(batch_size)
-        # image, targets = next(iter(training))
-        # Transfer_network = transfer_model.load_model(neural_net)
-        # image.cpu(), Transfer_network.cpu()
-        # image.requires_grad_()
-        # output = Transfer_network(image)
-        # output_idx = output.argmax()
-        # output_max = output[output_idx, 0]
-        # output_max.backward()
-        
-        # saliency, _ = torch.max(image.grad.data.abs(), dim=1)
-        # saliency = saliency.reshape(224, 224)
-        # image = image.reshape(-1, 224, 224)
-        # fig, ax = plt.subplots(1, 2)
-        # ax[0].imshow(image.cpu().detach().numpy().transpose(1, 2, 0))
-        # ax[0].axis('off')
-        # ax[1].imshow(saliency.cpu(), cmap='hot')
-        # ax[1].axis('off')
-        # plt.tight_layout()
-        # fig.suptitle('The Image and Its Saliency Map Before Training')
-        # plt.show()
-        
-        # # Saliency Map after training
-        # Transfer_network. load_state_dict(torch.load('./result/trained_transfer_' + neural_net + '.pkl'))
-        # image, targets = next(iter(training))
-        # image.cpu(), Transfer_network.cpu()
-        # image.requires_grad_()
-        # output = Transfer_network(image)
-        # output_idx = output.argmax()
-        # output_max = output[output_idx, 0]
-        # output_max.backward()
-        
-        # saliency, _ = torch.max(image.grad.data.abs(), dim=1)
-        # saliency = saliency.reshape(224, 224)
-        # image = image.reshape(-1, 224, 224)
-        # fig, ax = plt.subplots(1, 2)
-        # ax[0].imshow(image.cpu().detach().numpy().transpose(1, 2, 0))
-        # ax[0].axis('off')
-        # ax[1].imshow(saliency.cpu(), cmap='hot')
-        # ax[1].axis('off')
-        # plt.tight_layout()
-        # fig.suptitle('The Image and Its Saliency Map After Training')
-        # plt.show()
-        
         
 

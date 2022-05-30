@@ -48,12 +48,12 @@ class HybridModel(nn.Module):
         y = self.transfer_network(y)
         z = torch.cat((x, y), 1)
         z = self.norm(z)
-        z = self.dropout(z)
         z = self.linear1(z)
         z = self.relu(z)
         z = self.dropout(z)
         z = self.linear2(z)
         z = self.relu(z)
+        z = self.dropout(z)
         z = self.linear3(z)
         z = self.relu(z)
         z = self.output(z)
@@ -61,12 +61,12 @@ class HybridModel(nn.Module):
     
 if __name__ == "__main__":
     ld = functions()
-    epochs = 300
-    batch_size = 256
+    epochs = 200
+    batch_size = 258
     learning_rate = 0.001
     early_stop = 5
     cycle = 1
-    model_name = 'alexnet'
+    model_name = 'resnet50'
     transfer = 'n'
     
     '''
