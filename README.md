@@ -1,5 +1,5 @@
 # Hybrid_transfer
-Comparison of various transfer learning models with the hybridization of am FCNN for battery remaining-useful-life (RUL) prediction.
+Comparison of various transfer learning models with the hybridization of an FCNN for battery remaining-useful-life (RUL) prediction.
 
 This repository was made for the paper: 'Image- and health indicator-based transfer learning hybridization for battery RUL prediction'
 If you make use of this code for your own research, please cite: (J. Couture and X. Lin, "Image- and Health Indicator-Based Transfer Learning Hybridization fro Battery RUL Prediction" in Engineering Applications of Artificial Intelligence, https://doi.org/10.1016/j.engappai.2022.105120)
